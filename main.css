@@ -48,3 +48,12 @@ table {
 .left {
     text-align: left;
 }
+
+@media screen and (max-width: 425px) {
+    input {
+        width: 95%;
+    }
+    body {
+        font-size: 1em;
+    }
+  }

@@ -12,7 +12,7 @@
 <body>
     <div id="app">
         <div class="container">
-            <input type="text" v-model="searchText">
+            <input placeholder="Enter Student ID" type="text" v-model="searchText">
             <h4 v-if="filteredStd" class="name">{{filteredStd.id}} | {{filteredStd.name}}</h4>
             <table>
                 <tr>
