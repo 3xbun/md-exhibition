@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MD Exhibition</title>
+    <link rel="stylesheet" href="./main.css">
+</head>
+
+<body>
+    <div id="app">
+        <div class="container">
+            <input type="text" v-model="searchText">
+            <h4 v-if="filteredStd" class="name">{{filteredStd.id}} | {{filteredStd.name}}</h4>
+            <table>
+                <tr>
+                    <th class="event">Events</th>
+                    <th class="time">Time</th>
+                    <th class="stage">Stage</th>
+                </tr>
+                <tr v-for="item in filteredData">
+                    <td class="left">{{item.evtTitle}}</td>
+                    <td>{{item.time}}</td>
+                    <td>{{item.stage}}</td>
+                </tr>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="./queues.js"></script>
+    <script src="./Students.js"></script>
+    <script src="./main.js"></script>
+</body>
+
+</html>
