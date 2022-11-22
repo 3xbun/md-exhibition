@@ -665,7 +665,7 @@ const Queues = [
   },
   {
     evtTitle: "การจัดช่อดอกไม้ดอกเดี่ยว",
-    stage: "Lucia",
+    stage: "PG",
     time: "10.00 - 11.00",
     staff: [
       "16751",
@@ -687,7 +687,7 @@ const Queues = [
   },
   {
     evtTitle: "สาธิตการทำ Creamy mushroom soup",
-    stage: "Lucia",
+    stage: "PG",
     time: "12.00 - 12.30",
     staff: [
       "16966",
@@ -704,19 +704,19 @@ const Queues = [
   },
   {
     evtTitle: "การทดลอง Keychain from the used foil box",
-    stage: "Lucia",
+    stage: "PG",
     time: "12.30 - 13.00",
     staff: ["19118", "16242", "16249", "18236"],
   },
   {
     evtTitle: "ตะเกียบคีบสิ่งของ",
-    stage: "Lucia",
+    stage: "PG",
     time: "13.30 - 14.00",
     staff: ["16836", "18793", "18797", "18798", "18799"],
   },
   {
     evtTitle: "Fundamental Movement skill games",
-    stage: "Lucia",
+    stage: "PG",
     time: "14.00 - 14.30",
     staff: [
       "17579",
@@ -736,7 +736,7 @@ const Queues = [
   },
   {
     evtTitle: "การช่วยฟื้นคืนชีพ CPR",
-    stage: "Lucia",
+    stage: "PG",
     time: "14.30 - 15.00",
     staff: ["18796", "18786", "18798", "18854"],
   },
