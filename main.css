@@ -34,6 +34,8 @@ input {
 
 table {
     width: 100%;
+    border-collapse: separate;
+    border-spacing: 1em;
 }
 
 .name {
@@ -56,4 +58,8 @@ table {
     body {
         font-size: 1em;
     }
+    .time {
+        width: 40%;
+    }
+
   }
