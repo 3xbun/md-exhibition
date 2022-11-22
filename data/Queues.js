@@ -1209,6 +1209,7 @@ const Queues = [
       "18518",
       "15792",
       "18568",
+      "18507",
     ],
   },
   {
@@ -1463,7 +1464,7 @@ const Queues = [
     staff: ["18821"],
   },
   {
-    evtTitle: "Akiko",
+    evtTitle: "อยากบอกว่ารัก",
     stage: "Aud",
     time: "14.25 - 14.35",
     staff: ["16079"],
