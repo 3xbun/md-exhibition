@@ -16,13 +16,13 @@
             <h4 v-if="filteredStd" class="name">{{filteredStd.id}} | {{filteredStd.name}}</h4>
             <table>
                 <tr>
+                    <th class="time">Time</th>
                     <th class="event">Events</th>
                     <th class="time">Time</th>
-                    <th class="stage">Location</th>
                 </tr>
                 <tr v-for="item in filteredData">
-                    <td class="left">{{item.evtTitle}}</td>
                     <td>{{item.time}}</td>
+                    <td class="left">{{item.evtTitle}}</td>
                     <td>{{item.stage}}</td>
                 </tr>
                 </tr>
