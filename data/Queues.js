@@ -2,7 +2,7 @@ const Queues = [
   {
     evtTitle:
       "การแสดงประกอบเพลง Animals  + การศึกษาสไลด์ถาวรเนื้อเยื่อสัตว์ ด้วยกล้องจุลทรรศน์ 1",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "10:00-10:45",
     staff: [
       "18269",
@@ -27,7 +27,7 @@ const Queues = [
   },
   {
     evtTitle: "เมดเลย์อังกะลุง เมโลเดียน",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "10.45 - 11.00",
     staff: [
       "18411",
@@ -69,7 +69,7 @@ const Queues = [
   },
   {
     evtTitle: "การสาธิตการผ่าเพื่อศึกษาอวัยวะภายในของสัตว์ทดลอง 1",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "11.15 - 12.00",
     staff: [
       "16277",
@@ -85,7 +85,7 @@ const Queues = [
   },
   {
     evtTitle: "การศึกษาสไลด์ถาวรเนื้อเยื่อสัตว์ ด้วยกล้องจุลทรรศน์ 2",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "13.00 - 13.45",
     staff: [
       "19122",
@@ -100,7 +100,7 @@ const Queues = [
   },
   {
     evtTitle: "การศึกษาสไลด์ถาวรเนื้อเยื่อสัตว์ ด้วยกล้องจุลทรรศน์ 2",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "14.00 - 14.45",
     staff: [
       "16232",
@@ -116,7 +116,7 @@ const Queues = [
   },
   {
     evtTitle: "Coordinator",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "-",
     staff: [
       "18825",
@@ -132,31 +132,31 @@ const Queues = [
   },
   {
     evtTitle: "Creative",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "-",
     staff: ["18808", "18823", "18829", "16576", "17905", "16510"],
   },
   {
     evtTitle: "OnGround",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "-",
     staff: ["16058", "16075", "18843", "16480", "16547"],
   },
   {
     evtTitle: "OnStage",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "-",
     staff: ["16064", "18814", "16574", "18489", "16501", "16541", "16563"],
   },
   {
     evtTitle: "Producer",
-    stage: "ชั้น 6",
+    stage: "ลานชั้น 6",
     time: "-",
     staff: ["16005", "16036", "18488"],
   },
   {
     evtTitle: "ตอบคำถามเกี่ยวกับความรู้ภาษาจีนและวัฒนธรรมจีน โดยผ่านเกม kahoot",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "10.00 - 10.30",
     staff: [
       "15748",
@@ -178,25 +178,25 @@ const Queues = [
   },
   {
     evtTitle: "ร้องเพลง(เป็นไทยและจีนผสมกัน) รักแท้",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "10.30 - 10.45",
     staff: ["18793"],
   },
   {
     evtTitle: "2-minute Speeches",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "10.45 - 11.00",
     staff: ["18543", "18528", "17653"],
   },
   {
     evtTitle: "ท่องโลกกับ AR",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "11.00 - 11.45",
     staff: ["18855", "18503", "17929", "18501"],
   },
   {
     evtTitle: "วิทรรศน์ ณ กลางกรุง",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "12.00 - 12.30",
     staff: [
       "18803",
@@ -215,7 +215,7 @@ const Queues = [
   },
   {
     evtTitle: 'Presentations - "Tree of Life"',
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "12.30 - 13.00",
     staff: [
       "19056",
@@ -238,20 +238,20 @@ const Queues = [
   },
   {
     evtTitle: "การนำเสนออินดิเคเตอร์จากธรรมชาติ",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "13.00 - 14.00",
     staff: ["17023", "17211", "17001", "17007"],
   },
   {
     evtTitle: "การนำเสนอการทดลองปั้นน้ำเป็นตัวด้วยเกลือ",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "14.00 - 14.30",
     staff: ["17201", "17206", "17207", "18765"],
   },
   {
     evtTitle:
       "การทดลองการตรวจสอบสารอาหาร + White Matter ไขปริศนาสารสีขาวกับยอดนักสืบ",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "14.30 - 15.00",
     staff: [
       "16235",
@@ -267,25 +267,25 @@ const Queues = [
   },
   {
     evtTitle: "Coordinator",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "-",
     staff: ["17637", "18821", "16492", "16524", "16536", "18480"],
   },
   {
     evtTitle: "Creative",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "-",
     staff: ["16206", "18835", "18839", "16598", "16710"],
   },
   {
     evtTitle: "OnGround",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "-",
     staff: ["17922", "18852", "18858", "16545", "18857"],
   },
   {
     evtTitle: "OnStage",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "-",
     staff: [
       "17930",
@@ -302,13 +302,13 @@ const Queues = [
   },
   {
     evtTitle: "Producer",
-    stage: "Francis",
+    stage: "ห้องฟรังซิส",
     time: "-",
     staff: ["15993", "18220", "17632"],
   },
   {
     evtTitle: "Active Wear Fasion Show",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "9.45 - 10.30",
     staff: [
       "18631",
@@ -355,7 +355,7 @@ const Queues = [
   },
   {
     evtTitle: "Animal Puppet",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "10.45 - 11.30 ",
     staff: [
       "18638",
@@ -398,19 +398,19 @@ const Queues = [
   },
   {
     evtTitle: "Song",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "11.30 - 11.40",
     staff: ["18151", "18182", "18077", "18122", "18144", "18330"],
   },
   {
     evtTitle: "Skit",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "11.40 - 11.50",
     staff: ["17242", "17278", "17280", "17282", "17304", "17310"],
   },
   {
     evtTitle: "Scene from Little Women",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "11.50 - 12.00",
     staff: [
       "16721",
@@ -427,14 +427,14 @@ const Queues = [
   },
   {
     evtTitle: "Interview with a Celebrity",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "12.00 - 12.10",
     staff: ["16742", "16766", "16807", "16816"],
   },
   {
     evtTitle:
       "การแสดงประกอบเพลง สิ่งมีชีวิตที่เรียกว่าพืช+ การแสดงวัฏจักรน้ำ 2 + Circular Economy and Innovation: ฟองน้ำจากผักตบชวา",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "12.10 - 13.00",
     staff: [
       "17509",
@@ -477,13 +477,13 @@ const Queues = [
   },
   {
     evtTitle: "Scene from Wind in the Willows",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "13.00 - 13.15",
     staff: ["17208", "17207", "19026", "19052", "17037", "17555"],
   },
   {
     evtTitle: "Scene from A Midsummer Night's Dream",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "13.15 - 13.30",
     staff: [
       "17040",
@@ -498,31 +498,31 @@ const Queues = [
   },
   {
     evtTitle: "Grammar Game",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "13.30 - 13.40",
     staff: ["16982", "17005", "17046", "17058", "17209", "18765"],
   },
   {
     evtTitle: "Songs",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "13.40 - 13.50",
     staff: ["16961", "17043", "17212", "18599", "16972", "17014"],
   },
   {
     evtTitle: "20-Questions (Quiz)",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "13.50 - 14.00",
     staff: ["18868", "18872"],
   },
   {
     evtTitle: 'Presentations - "Inventions that Have Changed Our Lives"',
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "14.00 - 14.15",
     staff: ["18234", "18236", "18773", "18780", "19061", "18214"],
   },
   {
     evtTitle: "Japanese song",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "14.15 - 14.30",
     staff: [
       "16243",
@@ -542,13 +542,13 @@ const Queues = [
   },
   {
     evtTitle: "Histoire éternelle เพลงภาษาฝรั่งเศส",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "14.30 - 14.45",
     staff: ["15991", "16041", "18789"],
   },
   {
     evtTitle: "Coordinator",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "-",
     staff: [
       "18223",
@@ -564,19 +564,19 @@ const Queues = [
   },
   {
     evtTitle: "Creative",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "-",
     staff: ["17639", "18783", "16594", "18492"],
   },
   {
     evtTitle: "OnGround",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "-",
     staff: ["18221", "18840", "16534", "16554"],
   },
   {
     evtTitle: "OnStage",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "-",
     staff: [
       "18822",
@@ -591,13 +591,13 @@ const Queues = [
   },
   {
     evtTitle: "Producer",
-    stage: "Agnes",
+    stage: "ห้องอักเนส",
     time: "-",
     staff: ["16062", "18790", "16557"],
   },
   {
     evtTitle: "นิทานรักษ์โลก",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "9:45 - 10:00",
     staff: [
       "18349",
@@ -624,7 +624,7 @@ const Queues = [
   },
   {
     evtTitle: "เรขาฯพาเพลิน",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "10:00 - 10:15",
     staff: [
       "18362",
@@ -651,7 +651,7 @@ const Queues = [
   },
   {
     evtTitle: "วัฒนธรรมไทย ใคร ๆ ก็หลงรัก",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "10:15 - 10:30",
     staff: [
       "18344",
@@ -678,7 +678,7 @@ const Queues = [
   },
   {
     evtTitle: "Create that!",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "10:30 - 10:45",
     staff: [
       "18370",
@@ -705,7 +705,7 @@ const Queues = [
   },
   {
     evtTitle: "Paper Mâché",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "10:45 - 11:00",
     staff: [
       "18383",
@@ -720,7 +720,7 @@ const Queues = [
   },
   {
     evtTitle: "เกม Pseudocode",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "11:00 - 11:15",
     staff: [
       "18389",
@@ -743,7 +743,7 @@ const Queues = [
   },
   {
     evtTitle: "เป่ายิงฉุบ Yī Èr",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "11:15 - 11:30",
     staff: [
       "18352",
@@ -780,25 +780,25 @@ const Queues = [
   },
   {
     evtTitle: "เกม คำใด ใครรู้",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "12.00 - 12.30",
     staff: ["17665", "18292", "18532"],
   },
   {
     evtTitle: "เกมบิงโก ภาษาพูด - ภาษาเขียน",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "12.30 - 13.15",
     staff: ["16965", "17039", "17041", "17057", "17007", "17037"],
   },
   {
     evtTitle: "Tongue Twisters",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "13.15 - 13.30",
     staff: ["17890", "17867", "17788", "17828"],
   },
   {
     evtTitle: "Story Telling",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "13.30 - 13.40",
     staff: [
       "17523",
@@ -813,62 +813,62 @@ const Queues = [
   },
   {
     evtTitle: "Interview - Business Pitch",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "13.40 - 13.50",
     staff: ["16595", "18205"],
   },
   {
     evtTitle: "Presentation - Print Advertisement",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "13.50 - 14.05",
     staff: ["18487", "17906", "16490", "16528"],
   },
   {
     evtTitle:
       "Presentation (Research) - Startegies to Reject Negative Social Media Messages & Boost Self-Esteem",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "14.05 - 14.20",
     staff: ["16526", "16512", "16515", "16524", "16545", "16482", "16496"],
   },
   {
     evtTitle: "Rhyming Couplets Performances (with background music)",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "14.20 - 14.30",
     staff: ["16060", "18861", "16005", "16075"],
   },
   {
     evtTitle: "Coordinator",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "-",
     staff: ["17919", "16020", "16063", "16217"],
   },
   {
     evtTitle: "Creative",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "-",
     staff: ["15994", "16003", "16060"],
   },
   {
     evtTitle: "OnGround",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "-",
     staff: ["18500", "18796", "18806", "16061"],
   },
   {
     evtTitle: "OnStage",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "-",
     staff: ["18222", "18812"],
   },
   {
     evtTitle: "Producer",
-    stage: "Lucia",
+    stage: "ห้องลูเซีย",
     time: "-",
     staff: ["15997", "16226"],
   },
   {
     evtTitle: "การจัดช่อดอกไม้ดอกเดี่ยว",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "10.00 - 11.00",
     staff: [
       "16751",
@@ -890,7 +890,7 @@ const Queues = [
   },
   {
     evtTitle: "สาธิตการทำ Creamy mushroom soup",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "12.00 - 12.30",
     staff: [
       "16966",
@@ -907,25 +907,25 @@ const Queues = [
   },
   {
     evtTitle: "การทดลอง Keychain from the used foil box",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "12.30 - 13.00",
     staff: ["19118", "16242", "16249", "18236"],
   },
   {
     evtTitle: "บันไดงู",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "13.00 - 13.30",
     staff: ["15997", "18223", "18500", "18795"],
   },
   {
     evtTitle: "ตะเกียบคีบสิ่งของ",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "13.30 - 14.00",
     staff: ["16836", "18793", "18797", "18798", "18799"],
   },
   {
     evtTitle: "Fundamental Movement skill games",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "14.00 - 14.30",
     staff: [
       "17579",
@@ -945,14 +945,14 @@ const Queues = [
   },
   {
     evtTitle: "การช่วยฟื้นคืนชีพ CPR",
-    stage: "PG",
+    stage: "เวทีฝั่งตะวันออก",
     time: "14.30 - 15.00",
     staff: ["18796", "18786", "18798", "18854"],
   },
   {
     evtTitle:
       "Tous des Héros เกมคำศัพท์และความรู้ทั่วไปเกี่ยวกับประเทศที่พูดภาษาฝรั่งเศส",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "10.00 - 10.45",
     staff: [
       "15989",
@@ -974,7 +974,7 @@ const Queues = [
   },
   {
     evtTitle: "การแสดงวัฏจักรน้ำ 1 + การทดลอง เรือแก๊ส",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "10.45 - 11.15",
     staff: [
       "17509",
@@ -1008,7 +1008,7 @@ const Queues = [
   {
     evtTitle:
       "Le Français au quotidien เกมคำศัพท์และความรู้ทั่วไปเกี่ยวกับประเทศที่พูดภาษาฝรั่งเศส",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "11.15 - 12.00",
     staff: [
       "15728",
@@ -1027,19 +1027,19 @@ const Queues = [
   },
   {
     evtTitle: "Jigsaw มหาสนุก",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "12.00 - 12.45",
     staff: ["16823", "16946", "17721", "18313"],
   },
   {
     evtTitle: "Jigsaw มหาสนุก",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "12.45 - 13.30",
     staff: ["16724", "16759", "16765", "16829", "18872"],
   },
   {
     evtTitle: "Les Chiffres เกมตัวเลข",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "14.00 - 14.45",
     staff: [
       "16281",
@@ -1059,7 +1059,7 @@ const Queues = [
   },
   {
     evtTitle: "Coordinator",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "-",
     staff: [
       "15999",
@@ -1074,19 +1074,19 @@ const Queues = [
   },
   {
     evtTitle: "Creative",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "-",
     staff: ["18809", "18813", "18820", "16506", "17347", "16499"],
   },
   {
     evtTitle: "OnGround",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "-",
     staff: ["18842", "16555", "16490", "16552"],
   },
   {
     evtTitle: "OnStage",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "-",
     staff: [
       "18507",
@@ -1101,13 +1101,13 @@ const Queues = [
   },
   {
     evtTitle: "Producer",
-    stage: "P12",
+    stage: "เวทีฝั่งตะวันตก",
     time: "-",
     staff: ["16056", "17920", "17921", "16544"],
   },
   {
     evtTitle: "เพลงรำวงดาวพระศุกร์",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "9.00 - 9.45",
     staff: [
       "18075",
@@ -1266,7 +1266,7 @@ const Queues = [
   },
   {
     evtTitle: "เพลงสวัสดีเมืองไทย ",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "9.00 - 9.45",
     staff: [
       "17783",
@@ -1426,13 +1426,13 @@ const Queues = [
   },
   {
     evtTitle: "เพลงรากไทย",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "9.00 - 9.45",
     staff: ["19118", "16242", "16249", "18236"],
   },
   {
     evtTitle: "การแสดงชุด ผืนไท",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "10.00 - 10.30",
     staff: [
       "16966",
@@ -1476,7 +1476,7 @@ const Queues = [
   {
     evtTitle:
       "เพลงมะเทิง-เม้ยเจิง (ในบทละครเรื่องราชาธิราช ตอนพญาน้อยชมตลาด) เพลงเขมรพายเรือ",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "11.00 - 11.30",
     staff: [
       "17339",
@@ -1502,7 +1502,7 @@ const Queues = [
   },
   {
     evtTitle: "การบรรเลงเพลงโดยชมรมดนตรีไทย",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "12.30 - 13.00",
     staff: [
       "17472",
@@ -1525,7 +1525,7 @@ const Queues = [
   },
   {
     evtTitle: "การแสดงชุด เริงรำทำนา",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "13.00 - 13.30",
     staff: [
       "16968",
@@ -1557,7 +1557,7 @@ const Queues = [
   },
   {
     evtTitle: "Mater Dei Ochrestra MDO",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "14.00 - 15.00",
     staff: [
       "17559",
@@ -1597,7 +1597,7 @@ const Queues = [
   },
   {
     evtTitle: "Coordinator",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "-",
     staff: [
       "16012",
@@ -1616,13 +1616,13 @@ const Queues = [
   },
   {
     evtTitle: "Creative",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "-",
     staff: ["17638", "18505", "18836", "16551", "16553"],
   },
   {
     evtTitle: "OnGround",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "-",
     staff: [
       "16054",
@@ -1637,7 +1637,7 @@ const Queues = [
   },
   {
     evtTitle: "OnStage",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "-",
     staff: [
       "16004",
@@ -1654,13 +1654,13 @@ const Queues = [
   },
   {
     evtTitle: "Producer",
-    stage: "Cen",
+    stage: "สนามใหญ่",
     time: "-",
     staff: ["16052", "16015", "16083", "16205", "16523", "17634"],
   },
   {
     evtTitle: "การแข่งขันตอบปัญหาคณิตศาสตร์ ระดับมัธยมศึกษาตอนต้น",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "9.45 - 10.45",
     staff: [
       "17032",
@@ -1743,7 +1743,7 @@ const Queues = [
   {
     evtTitle:
       "การแสดงจินตลีลาประกอบเพลงพระราชนิพนธ์ เมดเลย์ 4 บทเพลงในโครงการ คีตราชนิพนธ์",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "11.00 - 11.15",
     staff: [
       "16328",
@@ -1763,7 +1763,7 @@ const Queues = [
   {
     evtTitle:
       "การแสดงนาฏศิลป์ร่วมสมัย ประกอบเพลงลาวดวงเดือน 2021 Under the Same Moon",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "11.30 - 11.45",
     staff: [
       "15972",
@@ -1781,7 +1781,7 @@ const Queues = [
   },
   {
     evtTitle: "การแสดงเพลงพื้นบ้าน (ฉ่อย)",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "11.45 - 12.15",
     staff: [
       "17797",
@@ -1811,7 +1811,7 @@ const Queues = [
   },
   {
     evtTitle: "การแสดงเพลงพื้นบ้านเชียร์กีฬาสี",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "12.15 - 12.30",
     staff: [
       "17284",
@@ -1826,7 +1826,7 @@ const Queues = [
   },
   {
     evtTitle: "กิจกรรมแข่งขันตอบปัญหาคณิตศาสตร์ วิทยาศาสตร์ เป็นภาษาอังกฤษ",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "12.45 - 13.45",
     staff: [
       "17816",
@@ -1869,31 +1869,31 @@ const Queues = [
   },
   {
     evtTitle: "Caro mio ben ",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "14.00 - 14.15",
     staff: ["18821"],
   },
   {
     evtTitle: "Part of your world",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "14.15 - 14.25",
     staff: ["18821"],
   },
   {
     evtTitle: "อยากบอกว่ารัก",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "14.25 - 14.35",
     staff: ["16079"],
   },
   {
     evtTitle: "Reflection",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "14.35 - 14.45",
     staff: ["16079"],
   },
   {
     evtTitle: "Coordinator",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "-",
     staff: [
       "16065",
@@ -1911,13 +1911,13 @@ const Queues = [
   },
   {
     evtTitle: "Creative",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "-",
     staff: ["16070", "17952", "18787", "16531", "16587", "18485"],
   },
   {
     evtTitle: "OnGround",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "-",
     staff: [
       "15972",
@@ -1934,7 +1934,7 @@ const Queues = [
   },
   {
     evtTitle: "OnStage",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "-",
     staff: [
       "15989",
@@ -1951,7 +1951,7 @@ const Queues = [
   },
   {
     evtTitle: "Producer",
-    stage: "Aud",
+    stage: "หอประชุม",
     time: "-",
     staff: ["17954", "18509", "17929", "16053", "16515", "16699"],
   },
