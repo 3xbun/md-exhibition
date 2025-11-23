@@ -29,6 +29,21 @@
       </h2>
 
       <table v-if="student">
+        <tr v-if="student.Duty">
+          <td class="head-title">หน้าที่</td>
+        </tr>
+        <tr v-if="student.Duty">
+          <td class="title">
+            {{ student.Duty }}
+          </td>
+          <td class="time">
+            {{ formatTime(student.DutyTime, 0) }}
+          </td>
+          <td class="location"></td>
+        </tr>
+        <tr v-if="student.Events > 0">
+          <td class="head-title">กิจกรรม</td>
+        </tr>
         <tr v-for="(title, index) in student.Title" :key="index">
           <td class="title">{{ title }}</td>
           <td class="time">
@@ -81,6 +96,19 @@ const searchStudent = () => {
 
 const formatTime = (start, end) => {
   dayjs.extend(customParseFormat);
+
+  if (end == 0) {
+    const time = start.split("-");
+    const s = dayjs(time[0], "HH:mm");
+    const e = dayjs(time[1], "HH:mm");
+
+    if (e.format("HH:mm") == "Invalid Date") {
+      return "ตั้งแต่ " + s.format("HH:mm");
+    }
+
+    return `${s.format("HH:mm")} - ${e.format("HH:mm")}`;
+  }
+
   const s = dayjs(start, "HH:mm:ss");
   const e = dayjs(end, "HH:mm:ss");
   return `${s.format("HH:mm")} - ${e.format("HH:mm")}`;
@@ -157,6 +185,11 @@ td:last-child {
 
 tr:nth-child(even) {
   background-color: var(--md-blue-dark);
+}
+
+.head-title {
+  font-weight: bolder;
+  font-size: 1.5em;
 }
 
 .title {
