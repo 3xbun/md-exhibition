@@ -7,11 +7,11 @@
     </div>
     <div class="contents">
       <h3>แผนที่ภาพรวม</h3>
-      <img src="/imgs/maps/map-overall.jpg" alt="" /> <br />
+      <img src="/imgs/maps/map-overall.jpeg" alt="" /> <br />
       <br />
 
       <h3>แผนที่ในอาคารอนุสสรณ์ 50 ปี</h3>
-      <img src="/imgs/maps/map-gymnasium.jpg" alt="" />
+      <img src="/imgs/maps/map-gymnasium.jpeg" alt="" />
     </div>
   </div>
 </template>
