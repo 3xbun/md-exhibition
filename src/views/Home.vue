@@ -49,7 +49,29 @@
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+import PostIt from "../components/PostIt.vue";
+import { onMounted, ref } from "vue";
+import axios from "axios";
+
+const msgs = ref([]);
+
+onMounted(() => {
+  const options = {
+    method: "GET",
+    url: "https://ndb.3xbun.com/api/v2/tables/m238nf5zt2oz5a3/records",
+    params: { offset: "0", limit: "25", where: "", viewId: "vwinzzllft9ikpls" },
+    headers: {
+      "xc-token": "3jFXBW3Q7u8bG1ITW0SevPfYNoi_mDfICFORPSkw",
+    },
+  };
+
+  axios
+    .request(options)
+    .then((res) => (msgs.value = res.data.list))
+    .catch((err) => console.error(err));
+});
+</script>
 
 <style scoped>
 .logo {
@@ -98,5 +120,27 @@ p.nav-item {
 
 .contents {
   margin: 1em 0;
+}
+
+.posts {
+  display: flex;
+  flex-wrap: wrap;
+  /* gap: 0.5em; */
+  /* flex-flow: column wrap; */
+  width: 100%;
+}
+
+.post {
+  width: calc(50% - 0.5em);
+  height: calc(50% - 0.5em);
+  padding: 0.5em;
+  color: var(--md-background);
+  border-radius: 0.1em;
+}
+
+@media (max-width: 768px) {
+  .post {
+    width: 100%;
+  }
 }
 </style>
