@@ -6,7 +6,12 @@
       <h1>แผนที่</h1>
     </div>
     <div class="contents">
-      <img src="/imgs/map.png" alt="" />
+      <h3>แผนที่ภาพรวม</h3>
+      <img src="/imgs/maps/map-overall.jpg" alt="" /> <br />
+      <br />
+
+      <h3>แผนที่ในอาคารอนุสสรณ์ 50 ปี</h3>
+      <img src="/imgs/maps/map-gymnasium.jpg" alt="" />
     </div>
   </div>
 </template>
@@ -21,5 +26,9 @@ import router from "../routers";
   align-items: center;
   margin-bottom: 1em;
   gap: 0.5em;
+}
+
+h3 {
+  color: var(--md-white);
 }
 </style>
