@@ -29,13 +29,21 @@
       </router-link>
     </nav>
     <div class="contents">
-      <img
-        src="https://www.effectivesoft.com/wp/wp-content/uploads/2022/12/%D1%86%D0%B8%D1%82%D0%B0%D1%82%D0%B0-%D0%B2-%D1%81%D0%B0%D0%B8%CC%86%D1%82.jpg"
-        alt=""
-      />
-      <img
-        src="https://www.effectivesoft.com/wp/wp-content/uploads/2022/12/%D1%86%D0%B8%D1%82%D0%B0%D1%82%D0%B0-%D0%B2-%D1%81%D0%B0%D0%B8%CC%86%D1%82.jpg"
-        alt=""
+      <img src="/imgs/msg-1.jpg" alt="" />
+      <img src="/imgs/msg-2.jpg" alt="" />
+    </div>
+
+    <br />
+    <h2>ข้อความจากกลุ่มสาระของเรา</h2>
+    <br />
+    <div class="posts">
+      <PostIt
+        class="post"
+        v-for="(msg, index) in msgs"
+        :key="index"
+        :seed="index"
+        :title="msg.Title"
+        :msg="msg.Message"
       />
     </div>
   </div>
