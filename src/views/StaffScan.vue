@@ -95,8 +95,11 @@ const stopScan = () => {
 };
 
 const handleScan = async (raw) => {
-  // QR encodes the badge code directly (MD-XXXXXX)
-  const code = String(raw).trim();
+  // QR may hold the badge URL (https://.../badge/PA-XXXXXX) or a bare code
+  let code = String(raw).trim();
+  const m = code.match(/badge\/([A-Za-z0-9-]+)/);
+  if (m) code = m[1];
+  code = code.replace(/^https?:\/\/[^\s]*?\/badge\//, "").split("?")[0];
   const rec = await findParentByBadgeCode(code);
   if (!rec?.fields) {
     result.value = { ok: false };
