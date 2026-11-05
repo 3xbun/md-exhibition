@@ -66,6 +66,14 @@
           <span>{{ th.register_btn }}</span>
         </button>
       </form>
+
+      <!-- My Badge: open the badge saved on THIS device -->
+      <div class="my-badge-block" v-if="latestBadge">
+        <router-link :to="`/badge/${encodeURIComponent(latestBadge.code)}`" class="my-badge-link">
+          <i class="fa-duotone fa-solid fa-id-badge"></i>
+          <span>{{ th.my_badge }}</span>
+        </router-link>
+      </div>
     </div>
 
     <!-- Badge (QR) -->
@@ -81,10 +89,11 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
 import { th } from "../copy/th.js";
+import { getLatestBadge } from "../api/myBadge.js";
 import {
   findMemberByStudentID,
   createParent,
@@ -106,7 +115,13 @@ const error = ref("");
 
 const registered = ref(null);
 const children = ref([]);
+const latestBadge = ref(getLatestBadge());
 let lookupTimer = null;
+
+// Keep "My Badge" in sync (registration, removal, cross-tab)
+const refreshMyBadge = () => (latestBadge.value = getLatestBadge());
+window.addEventListener("md-badge-change", refreshMyBadge);
+window.addEventListener("storage", refreshMyBadge);
 
 // Legacy entry: /register?badge=MD-XXXXXX now redirects to /badge/:code
 onMounted(() => {
@@ -114,6 +129,10 @@ onMounted(() => {
   if (code) {
     router.replace(`/badge/${encodeURIComponent(code)}`);
   }
+});
+onUnmounted(() => {
+  window.removeEventListener("md-badge-change", refreshMyBadge);
+  window.removeEventListener("storage", refreshMyBadge);
 });
 
 const lookUpStudent = async () => {
@@ -158,6 +177,7 @@ const register = async () => {
       name: `${rec.fields.FirstName} ${rec.fields.LastName}`,
       type: rec.fields.Type,
     });
+    refreshMyBadge();
   } catch (e) {
     console.error(e);
     error.value = "Error";
@@ -318,6 +338,32 @@ watch(studentID, (v) => {
   color: var(--md-text-soft);
   text-align: center;
   max-width: 420px;
+}
+.my-badge-block {
+  margin-top: 1.1rem;
+}
+.my-badge-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.8rem;
+  border-radius: 999px;
+  border: 1px solid var(--md-accent);
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  font-size: 1rem;
+  font-weight: 600;
+  transition: transform 0.15s ease;
+}
+.my-badge-link:hover {
+  transform: translateY(-1px);
+}
+.my-badge-link span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .print-btn {
   display: inline-flex;
