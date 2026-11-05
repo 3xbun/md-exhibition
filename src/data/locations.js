@@ -14,7 +14,7 @@ export const locations = [
     map: "/imgs/maps/map-overall.jpeg",
     icon: "fa-building-columns",
   },
-  { name: "MDO", map: "/imgs/maps/map-overall.jpeg", icon: "fa-children" },
+  { name: "MDO", map: "/imgs/maps/map-overall.jpeg", icon: "fa-music" },
   {
     name: "ลานอัญจลา",
     map: "/imgs/maps/map-overall.jpeg",
