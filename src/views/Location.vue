@@ -4,7 +4,7 @@
       <button class="back-btn" @click="router.go(-1)">
         <i class="fa-duotone fa-solid fa-angle-left"></i>
       </button>
-      <i class="fa-duotone fa-solid fa-location-dot title-icon"></i>
+      <i :class="`fa-duotone fa-solid ${loc?.icon || 'fa-location-dot'} title-icon`"></i>
       <h1>{{ locName }}</h1>
     </div>
 

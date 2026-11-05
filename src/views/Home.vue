@@ -33,7 +33,7 @@
           >
             <div class="loc-card-top">
               <span class="loc-icon">
-                <i class="fa-duotone fa-solid fa-location-dot"></i>
+                <i :class="`fa-duotone fa-solid ${loc.icon}`"></i>
               </span>
               <span class="loc-arrow">
                 <i class="fa-duotone fa-solid fa-chevron-right"></i>
