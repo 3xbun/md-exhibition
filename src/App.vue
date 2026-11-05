@@ -2,7 +2,7 @@
   <div class="app-shell">
     <router-link
       v-if="myBadge && !['/register', '/admin', '/staff'].includes($route.path)"
-      :to="`/badge/${encodeURIComponent(myBadge.code)}`"
+      to="/badge"
       class="signup-btn my-badge-btn"
     >
       <i class="fa-duotone fa-solid fa-id-badge"></i>
