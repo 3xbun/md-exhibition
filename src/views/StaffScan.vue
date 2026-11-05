@@ -33,6 +33,10 @@
       <h2 class="result-title">
         {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
       </h2>
+      <p v-if="result.ok" class="result-type" :class="result.parent.Type">
+        <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
+        {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
+      </p>
       <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
       <p v-if="result.ok && result.children.length" class="result-kids">
         {{ th.child_label }}:
@@ -185,6 +189,21 @@ onUnmounted(stopScan);
 .result-title {
   font-size: 1.5rem;
   font-weight: 700;
+}
+.result-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.result-type.guest {
+  background: #f7efdc;
+  color: var(--md-gold);
 }
 .result-code {
   letter-spacing: 0.12em;

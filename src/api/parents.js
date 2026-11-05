@@ -27,20 +27,29 @@ export async function findMemberByStudentID(studentID) {
   return res.data?.list?.[0] ?? null;
 }
 
-/** Create a parent record and link it to the given member id. */
+/** Create a parent/guest record (and link child when type is parent). */
 export async function createParent(parent, memberId) {
   const res = await axios.post(
     `${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`,
-    { fields: { FirstName: parent.FirstName, LastName: parent.LastName, BadgeCode: parent.BadgeCode } },
+    {
+      fields: {
+        FirstName: parent.FirstName,
+        LastName: parent.LastName,
+        BadgeCode: parent.BadgeCode,
+        Type: parent.Type,
+      },
+    },
     { headers: hdrs() }
   );
   const parentRecord = res.data?.records?.[0];
   if (!parentRecord) throw new Error("Parent create failed");
-  await axios.post(
-    `${BASE}/v3/data/${BASE_ID}/${PARENTS}/links/${CHILD_LINK_FIELD}/${parentRecord.id}`,
-    [memberId],
-    { headers: hdrs() }
-  );
+  if (memberId) {
+    await axios.post(
+      `${BASE}/v3/data/${BASE_ID}/${PARENTS}/links/${CHILD_LINK_FIELD}/${parentRecord.id}`,
+      [memberId],
+      { headers: hdrs() }
+    );
+  }
   return parentRecord;
 }
 
@@ -73,13 +82,17 @@ export async function hasParentForMember(memberId) {
   return Boolean(res.data?.records?.[0]?.fields?.Parent);
 }
 
-/** Unique-ish badge code, checked against existing badges. */
-export async function makeBadgeCode() {
+/**
+ * Unique badge code per type: PA-XXXXXXXX / GU-XXXXXXXX
+ * (random 6 alphanumeric, no 0/O/1/I). Checked against existing badges.
+ */
+export async function makeBadgeCode(type) {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O, 1/I
+  const prefix = type === "guest" ? "GU" : "PA";
   for (;;) {
     let tail = "";
     for (let i = 0; i < 6; i++) tail += alpha[Math.floor(Math.random() * alpha.length)];
-    const code = `MD-${tail}`;
+    const code = `${prefix}-${tail}`;
     const existing = await findParentByBadgeCode(code);
     if (!existing) return code;
   }

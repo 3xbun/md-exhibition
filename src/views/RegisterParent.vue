@@ -10,8 +10,31 @@
 
     <!-- Registration form -->
     <div class="form-card print-hide" v-if="!registered">
-      <p class="form-sub">{{ th.register_sub }}</p>
+      <p class="form-sub">{{ badgeType === "guest" ? th.guest_sub : th.register_sub }}</p>
       <form @submit.prevent="register">
+        <div class="type-toggle">
+          <span class="type-label">{{ th.type_label }}</span>
+          <div class="type-opts">
+            <button
+              type="button"
+              class="type-opt"
+              :class="{ active: badgeType === 'parent' }"
+              @click="badgeType = 'parent'"
+            >
+              <i class="fa-duotone fa-solid fa-user-shield"></i>
+              <span>{{ th.parent_label }}</span>
+            </button>
+            <button
+              type="button"
+              class="type-opt"
+              :class="{ active: badgeType === 'guest' }"
+              @click="badgeType = 'guest'"
+            >
+              <i class="fa-duotone fa-solid fa-user-group"></i>
+              <span>{{ th.guest_label }}</span>
+            </button>
+          </div>
+        </div>
         <label class="field">
           <span>{{ th.first_name }}</span>
           <input v-model.trim="firstName" required />
@@ -20,21 +43,25 @@
           <span>{{ th.last_name }}</span>
           <input v-model.trim="lastName" required />
         </label>
-        <label class="field">
+        <label class="field" v-if="badgeType === 'parent'">
           <span>{{ th.student_id }}</span>
           <input v-model.trim="studentID" required />
         </label>
 
-        <p v-if="foundStudent" class="found-student">
+        <p v-if="badgeType === 'parent' && foundStudent" class="found-student">
           <i class="fa-duotone fa-solid fa-circle-check"></i>
           <span>{{ foundStudent.FirstName }} {{ foundStudent.LastName }} ({{ foundStudent.StudentID }})</span>
           <router-link to="/search">{{ th.find_student }}</router-link>
         </p>
-        <p v-else-if="searched && !foundStudent" class="error">{{ th.id_not_found }}</p>
-        <p v-if="alreadyCount" class="note">{{ th.already_registered }}</p>
+        <p v-else-if="badgeType === 'parent' && searched && !foundStudent" class="error">{{ th.id_not_found }}</p>
+        <p v-if="badgeType === 'parent' && alreadyCount" class="note">{{ th.already_registered }}</p>
         <p v-if="error" class="error">{{ error }}</p>
 
-        <button type="submit" class="register-btn" :disabled="!foundStudent || busy">
+        <button
+          type="submit"
+          class="register-btn"
+          :disabled="(badgeType === 'parent' && !foundStudent) || busy"
+        >
           <i class="fa-duotone fa-solid fa-id-badge"></i>
           <span>{{ th.register_btn }}</span>
         </button>
@@ -53,8 +80,14 @@
           </div>
         </div>
         <div class="badge-name">{{ registered.FirstName }} {{ registered.LastName }}</div>
+        <div class="badge-type-row">
+          <span class="badge-type-chip" :class="registered.Type">
+            <i :class="registered.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
+            {{ registered.Type === 'guest' ? th.guest_label : th.parent_label }}
+          </span>
+        </div>
         <div class="badge-code">{{ registered.BadgeCode }}</div>
-        <div class="badge-children">
+        <div class="badge-children" v-if="children.length">
           <span class="badge-label">{{ th.child_label }}</span>
           <span v-for="kid in children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
         </div>
@@ -85,6 +118,7 @@ import {
 const firstName = ref("");
 const lastName = ref("");
 const studentID = ref("");
+const badgeType = ref("parent"); // "parent" | "guest"
 const foundStudent = ref(null);
 const searched = ref(false);
 const alreadyCount = ref(0);
@@ -124,20 +158,25 @@ const lookUpStudent = async () => {
 };
 
 const register = async () => {
-  if (!foundStudent.value) {
+  if (badgeType.value === "parent" && !foundStudent.value) {
     await lookUpStudent();
     if (!foundStudent.value) return;
   }
   busy.value = true;
   error.value = "";
   try {
-    const code = await makeBadgeCode();
+    const code = await makeBadgeCode(badgeType.value);
     const rec = await createParent(
-      { FirstName: firstName.value, LastName: lastName.value, BadgeCode: code },
-      foundStudent.value.Id
+      {
+        FirstName: firstName.value,
+        LastName: lastName.value,
+        BadgeCode: code,
+        Type: badgeType.value,
+      },
+      badgeType.value === "parent" ? foundStudent.value.Id : null
     );
     registered.value = rec.fields;
-    children.value = await getChildren(rec.id);
+    children.value = badgeType.value === "parent" ? await getChildren(rec.id) : [];
     drawQr(code);
   } catch (e) {
     console.error(e);
@@ -155,6 +194,7 @@ const drawQr = (text) => {
 const printBadge = () => window.print();
 
 watch(studentID, (v) => {
+  if (badgeType.value !== "parent") return;
   if (v.length >= 3) {
     // debounce: per-keystroke queries get rate-limited (401) by the API
     if (lookupTimer) clearTimeout(lookupTimer);
@@ -179,6 +219,42 @@ watch(studentID, (v) => {
 .form-sub {
   color: var(--md-text-soft);
   margin-bottom: 1.25rem;
+}
+.type-toggle {
+  margin-bottom: 1.1rem;
+}
+.type-label {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--md-text-soft);
+  margin-bottom: 0.4rem;
+}
+.type-opts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+.type-opt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.7rem;
+  border: 1.5px solid var(--md-border);
+  border-radius: 0.7rem;
+  background: var(--md-bg);
+  color: var(--md-text-soft);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.type-opt.active {
+  border-color: var(--md-accent);
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
 }
 .field {
   display: block;
@@ -306,6 +382,22 @@ watch(studentID, (v) => {
 .badge-name {
   font-size: 1.45rem;
   font-weight: 700;
+}
+.badge-type-row {
+  margin-top: 0.5rem;
+}
+.badge-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.badge-type-chip.guest {
+  background: rgba(185, 138, 30, 0.4);
 }
 .badge-code {
   margin-top: 0.25rem;
