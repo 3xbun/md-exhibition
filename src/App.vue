@@ -104,8 +104,13 @@ onMounted(() => {
   max-width: 160px;
 }
 @media (max-width: 600px) {
+  /* Icon-only on phones */
   .my-badge-btn span {
-    max-width: 110px;
+    display: none;
+  }
+  .my-badge-btn {
+    padding: 0.55rem;
+    gap: 0;
   }
 }
 
