@@ -32,6 +32,7 @@ export function saveMyBadge(badge) {
   } catch {
     /* private mode etc. — non-fatal */
   }
+  try { window.dispatchEvent(new Event("md-badge-change")); } catch {}
 }
 
 /** Remove a badge by code. */
@@ -41,6 +42,7 @@ export function removeMyBadge(code) {
   } catch {
     /* ignore */
   }
+  try { window.dispatchEvent(new Event("md-badge-change")); } catch {}
 }
 
 /** True if a badge code is stored on this device. */

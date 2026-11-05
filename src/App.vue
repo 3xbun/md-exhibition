@@ -45,8 +45,13 @@ watch(
 const onStorage = (e) => {
   if (e?.key === "md-exhibition.badges") myBadge.value = getLatestBadge();
 };
+const onLocal = () => (myBadge.value = getLatestBadge());
 window.addEventListener("storage", onStorage);
-onUnmounted(() => window.removeEventListener("storage", onStorage));
+window.addEventListener("md-badge-change", onLocal);
+onUnmounted(() => {
+  window.removeEventListener("storage", onStorage);
+  window.removeEventListener("md-badge-change", onLocal);
+});
 
 const EVENTS_TABLE = import.meta.env.VITE_EVENTS_TABLE || "mqdt1iaupd641lf";
 const TOKEN =
