@@ -7,6 +7,7 @@ import Search from "../views/Search.vue";
 import RegisterParent from "../views/RegisterParent.vue";
 import StaffScan from "../views/StaffScan.vue";
 import Badge from "../views/Badge.vue";
+import Admin from "../views/Admin.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -16,6 +17,7 @@ const routes = [
   { path: "/register", name: "register", component: RegisterParent },
   { path: "/staff", name: "staff", component: StaffScan },
   { path: "/badge/:code", name: "badge", component: Badge },
+  { path: "/admin", name: "admin", component: Admin },
 ];
 
 const router = createRouter({

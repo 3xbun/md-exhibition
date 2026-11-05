@@ -73,6 +73,18 @@ export async function getChildren(parentId) {
   return res.data?.records ?? [];
 }
 
+/** All registered badges (parents + guests). */
+export async function listParents(limit = 200) {
+  const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`, {
+    params: {
+      limit: String(limit),
+      sort: JSON.stringify([{ field: "CreatedAt", direction: "desc" }]),
+    },
+    headers: hdrs(),
+  });
+  return res.data?.records ?? [];
+}
+
 /** True if a member (student) already has a parent badge linked. */
 export async function hasParentForMember(memberId) {
   const res = await axios.get(
