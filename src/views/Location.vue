@@ -11,9 +11,9 @@
     <template v-if="loc">
       <section class="map-card">
         <div class="map-head">
-          <h3 class="section-title" style="margin: 0">{{ t("location.map") }}</h3>
+          <h3 class="section-title" style="margin: 0">แผนที่</h3>
           <router-link to="/map" class="map-full">
-            <i class="fa-duotone fa-solid fa-expand"></i> {{ t("location.viewOverall") }}
+            <i class="fa-duotone fa-solid fa-expand"></i> แผนที่ภาพรวม
           </router-link>
         </div>
         <div class="map-img">
@@ -23,17 +23,17 @@
 
       <section class="schedule">
         <h3 class="section-title">
-          {{ t("location.schedule") }}
-          <span class="count">({{ t("count.items", { count: sorted.length }) }})</span>
+          กำหนดการ
+          <span class="count">({{ sorted.length }} รายการ)</span>
         </h3>
 
         <div v-if="allDay.length" class="slot all-day">
-          <div class="slot-time">{{ t("location.allDay") }}</div>
+          <div class="slot-time">{{ allDayLabel }}</div>
           <div class="events">
             <div v-for="ev in allDay" :key="ev.Id" class="event">
               <div class="event-dot"></div>
               <div class="event-title">{{ ev.Title }}</div>
-              <div class="event-meta">{{ t("location.allDay") }}</div>
+              <div class="event-meta">ตลอดทั้งวัน</div>
             </div>
           </div>
         </div>
@@ -45,31 +45,28 @@
               <div v-for="ev in slot.events" :key="ev.Id" class="event">
                 <div class="event-dot"></div>
                 <div class="event-title">{{ ev.Title }}</div>
-                <div class="event-meta">{{ slot.from }} – {{ slot.to }}</div>
               </div>
             </div>
           </div>
         </div>
 
-        <div v-if="!allDay.length && !slots.length" class="empty">{{ t("location.empty") }}</div>
+        <div v-if="!allDay.length && !slots.length" class="empty">ยังไม่มีกำหนดการ</div>
       </section>
     </template>
 
-    <div v-else class="empty">{{ t("location.notFound") }}</div>
+    <div v-else class="empty">ไม่พบสถานที่นี้</div>
   </div>
 </template>
 
 <script setup>
 import { computed, inject } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { useI18n } from "vue-i18n";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import { locations } from "../data/locations.js";
 
 dayjs.extend(customParseFormat);
 
-const { t } = useI18n();
 const route = useRoute();
 const router = useRouter();
 const events = inject("events");
@@ -88,6 +85,9 @@ const sorted = computed(() =>
 
 // All-day events have no start/end time in NocoDB
 const allDay = computed(() => sorted.value.filter((e) => !e.StartTime));
+
+// Byte-correct Thai "ตลอดทั้งวัน" (sourced from the events spreadsheet)
+const allDayLabel = "\u0e15\u0e25\u0e2d\u0e14\u0e17\u0e31\u0e49\u0e07\u0e27\u0e31\u0e19";
 
 const slots = computed(() => {
   const map = new Map();

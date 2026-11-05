@@ -5,20 +5,20 @@
         <i class="fa-duotone fa-solid fa-angle-left"></i>
       </button>
       <i class="fa-duotone fa-solid fa-address-card title-icon"></i>
-      <h1>{{ t("search.title") }}</h1>
+      <h1>ค้นหาด้วยเลขประจำตัวนักเรียน</h1>
     </div>
 
     <div class="searchBar">
       <input
         type="text"
         class="stdID"
-        :placeholder="t('search.placeholder')"
+        placeholder="กรอกเลขประจำตัว"
         v-model="stdID"
         @keypress.enter="searchStudent()"
       />
       <button class="searchBtn" @click="searchStudent()">
         <i class="fa-duotone fa-magnifying-glass"></i>
-        <span>{{ t("search.button") }}</span>
+        <span>ค้นหา</span>
       </button>
     </div>
 
@@ -33,7 +33,7 @@
 
       <div class="results">
         <div v-if="student.Duty" class="group">
-          <h3 class="group-title">{{ t("search.duty") }}</h3>
+          <h3 class="group-title">หน้าที่</h3>
           <div class="row duty">
             <span class="row-title">{{ student.Duty }}</span>
             <span class="row-time">
@@ -43,7 +43,7 @@
         </div>
 
         <div v-if="student.Events > 0" class="group">
-          <h3 class="group-title">{{ t("search.activities") }}</h3>
+          <h3 class="group-title">กิจกรรม</h3>
           <div
             v-for="(title, index) in student.Title"
             :key="index"
@@ -62,7 +62,7 @@
       </div>
     </div>
 
-    <p v-else-if="searched" class="no-result">{{ t("search.noResult") }}</p>
+    <p v-else-if="searched" class="no-result">ไม่พบนักเรียน</p>
   </div>
 </template>
 
@@ -70,11 +70,9 @@
 import axios from "axios";
 import router from "../routers";
 import { ref } from "vue";
-import { useI18n } from "vue-i18n";
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 
-const { t } = useI18n();
 const student = ref("");
 const stdID = ref("");
 const searched = ref(false);
@@ -110,15 +108,15 @@ const formatTime = (start, end) => {
     const e = dayjs(time[1], "HH:mm");
 
     if (e.format("HH:mm") == "Invalid Date") {
-      return t("search.from") + " " + s.format("HH:mm");
+      return "ตั้งแต่ " + s.format("HH:mm");
     }
 
-    return `${s.format("HH:mm")} - ${e.format("HH:mm")}`;
+    return `${s.format("HH:mm")} – ${e.format("HH:mm")}`;
   }
 
   const s = dayjs(start, "HH:mm:ss");
   const e = dayjs(end, "HH:mm:ss");
-  return `${s.format("HH:mm")} - ${e.format("HH:mm")}`;
+  return `${s.format("HH:mm")} – ${e.format("HH:mm")}`;
 };
 </script>
 
