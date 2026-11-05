@@ -15,6 +15,14 @@
         <i class="fa-duotone fa-solid fa-print"></i>
         <span>{{ th.print_btn }}</span>
       </button>
+      <button
+        v-if="isMine"
+        class="remove-btn print-hide"
+        @click="removeMe"
+      >
+        <i class="fa-duotone fa-solid fa-xmark"></i>
+        <span>{{ th.badge_removed }}</span>
+      </button>
     </div>
     <p v-else-if="loaded" class="no-result">{{ th.not_found }}</p>
   </div>
@@ -27,15 +35,18 @@ import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
 import { th } from "../copy/th.js";
 import { findParentByBadgeCode, getChildren } from "../api/parents.js";
+import { hasMyBadge, removeMyBadge } from "../api/myBadge.js";
 
 const route = useRoute();
 const parent = ref(null);
 const children = ref([]);
 const loaded = ref(false);
+const isMine = ref(false);
 
 onMounted(async () => {
   const code = String(route.params.code ?? "").trim();
   if (code) {
+    isMine.value = hasMyBadge(code);
     const rec = await findParentByBadgeCode(code);
     if (rec?.fields) {
       parent.value = rec.fields;
@@ -46,6 +57,13 @@ onMounted(async () => {
 });
 
 const printBadge = () => window.print();
+
+const removeMe = () => {
+  const code = String(route.params.code ?? "").trim();
+  if (!code) return;
+  removeMyBadge(code);
+  router.replace("/");
+};
 </script>
 
 <style scoped>
@@ -79,6 +97,20 @@ const printBadge = () => window.print();
   text-align: center;
   color: var(--md-text-muted);
   padding: 2rem 0;
+}
+.remove-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1.2rem;
+  border: 1px solid #f1d4cf;
+  border-radius: 999px;
+  background: var(--md-surface);
+  color: #c0392b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 @media print {

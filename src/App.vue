@@ -1,9 +1,17 @@
 <template>
   <div class="app-shell">
     <router-link
-      v-if="!['/register', '/admin', '/staff'].includes($route.path)"
+      v-if="myBadge && !['/register', '/admin', '/staff'].includes($route.path)"
+      :to="`/badge/${encodeURIComponent(myBadge.code)}`"
+      class="signup-btn my-badge-btn"
+    >
+      <i class="fa-duotone fa-solid fa-id-badge"></i>
+      <span>{{ myBadge.name }}</span>
+    </router-link>
+    <router-link
+      v-else-if="!['/register', '/admin', '/staff'].includes($route.path)"
       to="/register"
-      class="signup-btn print-hide"
+      class="signup-btn"
     >
       <i class="fa-duotone fa-solid fa-id-badge"></i>
       <span>{{ th.register_btn }}</span>
@@ -17,12 +25,28 @@
 
 <script setup>
 import axios from "axios";
-import { onMounted, provide, ref } from "vue";
+import { ref, onMounted, onUnmounted, provide, watch } from "vue";
+import { useRoute } from "vue-router";
 import Footer from "./components/Footer.vue";
 import { th } from "./copy/th.js";
+import { getLatestBadge } from "./api/myBadge.js";
 
 const events = ref([]);
 provide("events", events);
+
+// "My Badge" shortcut: most recent badge saved on THIS device (localStorage,
+// no accounts). Re-read on every route change + cross-tab storage events.
+const route = useRoute();
+const myBadge = ref(getLatestBadge());
+watch(
+  () => route.fullPath,
+  () => (myBadge.value = getLatestBadge())
+);
+const onStorage = (e) => {
+  if (e?.key === "md-exhibition.badges") myBadge.value = getLatestBadge();
+};
+window.addEventListener("storage", onStorage);
+onUnmounted(() => window.removeEventListener("storage", onStorage));
 
 const EVENTS_TABLE = import.meta.env.VITE_EVENTS_TABLE || "mqdt1iaupd641lf";
 const TOKEN =
@@ -61,6 +85,23 @@ onMounted(() => {
 .signup-btn:hover {
   transform: translateY(-1px);
   box-shadow: var(--md-shadow-lg);
+}
+.my-badge-btn {
+  background: var(--md-accent);
+  color: #fff;
+  border-color: var(--md-accent);
+  max-width: 60vw;
+}
+.my-badge-btn span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 160px;
+}
+@media (max-width: 600px) {
+  .my-badge-btn span {
+    max-width: 110px;
+  }
 }
 
 @media print {

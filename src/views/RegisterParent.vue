@@ -92,6 +92,7 @@ import {
   getChildren,
   hasParentForMember,
 } from "../api/parents.js";
+import { saveMyBadge } from "../api/myBadge.js";
 
 const firstName = ref("");
 const lastName = ref("");
@@ -151,6 +152,12 @@ const register = async () => {
     );
     registered.value = rec.fields;
     children.value = badgeType.value === "parent" ? await getChildren(rec.id) : [];
+    // keep the badge on this device for easy re-access (no password)
+    saveMyBadge({
+      code: rec.fields.BadgeCode,
+      name: `${rec.fields.FirstName} ${rec.fields.LastName}`,
+      type: rec.fields.Type,
+    });
   } catch (e) {
     console.error(e);
     error.value = "Error";
