@@ -1,6 +1,6 @@
 <template>
   <footer>
-    <i class="fa-light fa-copyright"></i> 2025 Mater Dei School | All Rights
+    <i class="fa-light fa-copyright"></i> 2026 Mater Dei School | All Rights
     Reserved
     <span class="version">v{{ version }}</span>
   </footer>
