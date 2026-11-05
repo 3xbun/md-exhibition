@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell">
     <router-link
-      v-if="$route.path !== '/register'"
+      v-if="$route.path !== '/register' && $route.path !== '/admin'"
       to="/register"
       class="signup-btn print-hide"
     >
