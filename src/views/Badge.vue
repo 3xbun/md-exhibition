@@ -5,10 +5,37 @@
         <i class="fa-duotone fa-solid fa-angle-left"></i>
       </button>
       <i class="fa-duotone fa-solid fa-id-badge title-icon"></i>
-      <h1>{{ th.badge_title }}</h1>
+      <h1>{{ listMode ? th.badge_list : th.badge_title }}</h1>
     </div>
 
-    <div class="badge-wrap" v-if="parent">
+    <div v-if="listMode">
+      <p class="badge-sub print-hide">{{ th.badge_list_sub }}</p>
+      <div v-if="badges.length" class="badge-list">
+        <router-link
+          v-for="b in badges"
+          :key="b.code"
+          :to="`/badge/${encodeURIComponent(b.code)}`"
+          class="badge-row"
+        >
+          <i
+            class="fa-duotone fa-solid"
+            :class="b.type === 'guest' ? 'fa-user-group' : 'fa-user-shield'"
+          ></i>
+          <span class="badge-row-name">{{ b.name }}</span>
+          <span class="badge-row-code">{{ b.code }}</span>
+          <button
+            class="badge-row-x"
+            @click.stop.prevent="removeMe(b.code)"
+            :title="th.badge_removed"
+          >
+            <i class="fa-duotone fa-solid fa-xmark"></i>
+          </button>
+        </router-link>
+      </div>
+      <p v-else class="no-result">{{ th.badge_list_empty }}</p>
+    </div>
+
+    <div class="badge-wrap" v-else-if="parent">
       <p class="badge-sub print-hide">{{ th.badge_sub }}</p>
       <BadgeCard :parent="parent" :children="children" />
       <div class="badge-actions print-hide">
@@ -55,14 +82,19 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
 import QrCanvas from "../components/QrCanvas.vue";
 import { th } from "../copy/th.js";
 import { findParentByBadgeCode, getChildren } from "../api/parents.js";
-import { hasMyBadge, removeMyBadge, saveMyBadge } from "../api/myBadge.js";
+import {
+  getMyBadges,
+  hasMyBadge,
+  removeMyBadge,
+  saveMyBadge,
+} from "../api/myBadge.js";
 
 const route = useRoute();
 const parent = ref(null);
@@ -71,6 +103,17 @@ const loaded = ref(false);
 const isMine = ref(false);
 const shareOpen = ref(false);
 const sentDone = ref(false);
+
+// /badge (no code) lists every badge saved on THIS device (localStorage).
+const listMode = computed(() => !String(route.params.code ?? "").trim());
+const badges = ref(getMyBadges());
+const refreshBadges = () => (badges.value = getMyBadges());
+window.addEventListener("md-badge-change", refreshBadges);
+window.addEventListener("storage", refreshBadges);
+onUnmounted(() => {
+  window.removeEventListener("md-badge-change", refreshBadges);
+  window.removeEventListener("storage", refreshBadges);
+});
 
 const QR_BASE = "https://md-exhibition.pages.dev";
 const badgeUrl = computed(() => `${QR_BASE}/badge/${parent.value?.BadgeCode ?? ""}`);
@@ -100,11 +143,11 @@ const saveHere = () => {
   isMine.value = true;
 };
 
-const removeMe = () => {
-  const code = String(route.params.code ?? "").trim();
-  if (!code) return;
-  removeMyBadge(code);
-  router.replace("/");
+const removeMe = (code) => {
+  const c = code ?? String(route.params.code ?? "").trim();
+  if (!c) return;
+  removeMyBadge(c);
+  if (!listMode.value) router.replace("/");
 };
 
 const confirmSent = () => {
@@ -147,6 +190,55 @@ const confirmSent = () => {
   text-align: center;
   color: var(--md-text-muted);
   padding: 2rem 0;
+}
+.badge-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+}
+.badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--md-border);
+  border-radius: 0.9rem;
+  background: var(--md-surface);
+  color: var(--md-text);
+  text-decoration: none;
+  box-shadow: var(--md-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.badge-row:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--md-shadow-lg);
+}
+.badge-row-name {
+  font-weight: 600;
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.badge-row-code {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  color: var(--md-text-muted);
+}
+.badge-row-x {
+  border: none;
+  background: none;
+  color: #c0392b;
+  cursor: pointer;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+.badge-row-x:hover {
+  background: #f7e8e5;
 }
 .badge-actions {
   display: flex;
