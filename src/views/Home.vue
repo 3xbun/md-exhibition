@@ -1,59 +1,69 @@
 <template>
-  <div class="container">
-    <div class="logo">
-      <img src="/imgs/logo-alternate.png" alt="" />
-    </div>
-    <h1>MD Exhibition</h1>
-    <h2>งานนิทรรศการประจำปี <br />โรงเรียนมาแตร์เดอีวิทยาลัย</h2>
-
-    <nav>
-      <router-link to="/map" class="nav-item">
-        <i class="fa-duotone fa-solid fa-map-location-dot"></i> แผนที่
-      </router-link>
-      <router-link to="/search" class="nav-item">
-        <i class="fa-duotone fa-solid fa-address-card"></i>
-        ค้นหาด้วยเลขประจำตัวนักเรียน
-      </router-link>
-    </nav>
-
-    <h2>สถานที่จัดกิจกรรม</h2>
-    <div class="locations">
-      <router-link
-        v-for="loc in locations"
-        :key="loc.name"
-        :to="`/location/${encodeURIComponent(loc.name)}`"
-        class="location-card"
-      >
-        <div class="location-name">{{ loc.name }}</div>
-        <div class="location-count">
-          {{ programCount(loc.name) }} รายการ
+  <div class="home">
+    <section class="hero">
+      <div class="hero-inner container">
+        <div class="logo">
+          <img src="/imgs/logo-alternate.png" alt="" />
         </div>
-      </router-link>
-    </div>
+        <h1 class="hero-title">MD Exhibition</h1>
+        <p class="hero-sub">งานนิทรรศการประจำปี <br />โรงเรียนมาแตร์เดอีวิทยาลัย</p>
 
-    <div class="contents">
-      <img src="/imgs/msg-1.jpg" alt="" />
-      <img src="/imgs/msg-2.jpg" alt="" />
-    </div>
+        <div class="hero-actions">
+          <router-link to="/map" class="action-btn">
+            <i class="fa-duotone fa-solid fa-map-location-dot"></i>
+            <span>แผนที่</span>
+          </router-link>
+          <router-link to="/search" class="action-btn alt">
+            <i class="fa-duotone fa-solid fa-address-card"></i>
+            <span>ค้นหานักเรียน</span>
+          </router-link>
+        </div>
+      </div>
+    </section>
 
-    <br />
-    <h2>ข้อความจากกลุ่มสาระของเรา</h2>
-    <br />
-    <div class="posts">
-      <PostIt
-        class="post"
-        v-for="(msg, index) in msgs"
-        :key="index"
-        :seed="index"
-        :title="msg.Title"
-        :msg="msg.Message"
-      />
-    </div>
+    <main class="container">
+      <section class="locations">
+        <h2 class="section-title">สถานที่จัดกิจกรรม</h2>
+        <div class="loc-grid">
+          <router-link
+            v-for="loc in locations"
+            :key="loc.name"
+            :to="`/location/${encodeURIComponent(loc.name)}`"
+            class="loc-card"
+          >
+            <div class="loc-card-top">
+              <span class="loc-icon">
+                <i class="fa-duotone fa-solid fa-location-dot"></i>
+              </span>
+              <span class="loc-arrow">
+                <i class="fa-duotone fa-solid fa-chevron-right"></i>
+              </span>
+            </div>
+            <div class="loc-name">{{ loc.name }}</div>
+            <div class="loc-count">{{ programCount(loc.name) }} รายการ</div>
+          </router-link>
+        </div>
+      </section>
+
+      <section class="messages">
+        <h2 class="section-title">ข้อความจากกลุ่มสาระของเรา</h2>
+        <div class="msg-grid">
+          <PostIt
+            class="post"
+            v-for="(msg, index) in msgs"
+            :key="index"
+            :seed="index"
+            :title="msg.Title"
+            :msg="msg.Message"
+          />
+        </div>
+      </section>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { computed, inject, onMounted, ref } from "vue";
+import { inject, onMounted, ref } from "vue";
 import axios from "axios";
 import PostIt from "../components/PostIt.vue";
 import { locations } from "../data/locations.js";
@@ -79,83 +89,142 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* --- Hero --- */
+.hero {
+  background: linear-gradient(180deg, var(--md-accent) 0%, #1f3f9e 100%);
+  color: #fff;
+  text-align: center;
+}
+.hero-inner {
+  padding-top: 3rem;
+  padding-bottom: 3.5rem;
+}
 .logo {
-  margin: auto;
-  width: 25%;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  background: #fff;
+  padding: 0.4rem;
+  margin: 0 auto 1.25rem;
+  box-shadow: var(--md-shadow-lg);
+}
+.logo img {
   border-radius: 50%;
 }
-h1,
-h2 {
-  text-align: center;
+.hero-title {
+  font-size: clamp(1.9rem, 5vw, 2.6rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
 }
-h2 {
-  color: var(--md-gray);
+.hero-sub {
+  margin-top: 0.6rem;
+  font-size: 1.05rem;
+  font-weight: 300;
+  opacity: 0.92;
 }
-
-nav {
-  margin: 2em 0;
+.hero-actions {
   display: flex;
   flex-wrap: wrap;
+  gap: 0.85rem;
   justify-content: center;
-  gap: 1em;
+  margin-top: 2rem;
 }
-
-.nav-item {
-  padding: 0.5em 1em;
-  border-radius: 0.5em;
-  text-align: center;
-  color: var(--md-blue-darker);
-  background-color: var(--md-gray);
-  cursor: pointer;
-}
-
-.locations {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5em;
-  margin: 1em 0;
-}
-.location-card {
-  flex: 1 1 calc(50% - 0.5em);
-  min-width: 140px;
-  padding: 1.2em;
-  border-radius: 0.75em;
-  background-color: var(--md-blue-dark);
-  border: 1px solid var(--md-gray-dark);
-  text-align: center;
-  color: var(--md-white);
-  transition: transform 0.12s ease;
-}
-.location-card:hover {
-  transform: translateY(-2px);
-}
-.location-name {
-  font-size: 1.15em;
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--md-accent);
   font-weight: 600;
+  font-size: 1rem;
+  box-shadow: var(--md-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
-.location-count {
-  margin-top: 0.5em;
-  color: var(--md-gold);
-  font-size: 0.9em;
+.action-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--md-shadow-lg);
+}
+.action-btn.alt {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+  backdrop-filter: blur(4px);
 }
 
-.contents {
-  margin: 1em 0;
+/* --- Hero nav already above; no old-style nav --- */
+
+/* --- Locations --- */
+.locations {
+  margin-top: 1.5rem;
 }
-.posts {
+.loc-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 1rem;
+}
+.loc-card {
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 1rem;
+  padding: 1.1rem 1.2rem;
+  box-shadow: var(--md-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.loc-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--md-shadow-lg);
+  border-color: var(--md-accent);
+}
+.loc-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.loc-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.75rem;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+}
+.loc-arrow {
+  color: var(--md-text-muted);
+  font-size: 0.9rem;
+}
+.loc-name {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--md-text);
+}
+.loc-count {
+  margin-top: 0.25rem;
+  color: var(--md-text-muted);
+  font-size: 0.9rem;
+}
+
+/* --- Messages --- */
+.messages {
+  margin-top: 2.5rem;
+}
+.msg-grid {
   display: flex;
   flex-wrap: wrap;
-  width: 100%;
+  gap: 1rem;
 }
 .post {
-  width: calc(50% - 0.5em);
+  flex: 1 1 260px;
+  min-width: 240px;
 }
+
 @media (max-width: 600px) {
-  .post {
-    width: 100%;
-  }
-  .location-card {
-    flex: 1 1 100%;
+  .loc-grid {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
 }
 </style>

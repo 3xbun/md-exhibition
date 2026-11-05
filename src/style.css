@@ -1,22 +1,24 @@
-@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
-@import url("https://fonts.googleapis.com/css2?family=Sriracha&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Prompt:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap");
 
 :root {
-  /* --- Core Colors --- */
-  --md-blue: #5c8cff; /* Primary blue accent */
-  --md-blue-dark: #0f1c33; /* Deep navy background */
-  --md-blue-darker: #0a1426; /* Section contrast background */
-  --md-white: #e9edf5; /* Primary text color */
-  --md-background: #0f0f0f;
+  /* --- Core --- */
+  --md-bg: #f4f6fa;
+  --md-surface: #ffffff;
+  --md-surface-2: #eef1f6;
+  --md-text: #1b2436;
+  --md-text-soft: #5a6577;
+  --md-text-muted: #8b94a6;
 
-  /* --- Neutrals --- */
-  --md-gray: #a0aec0; /* Secondary text */
-  --md-gray-dark: #2d3748; /* Borders or panel lines */
-  --md-gray-light: #cbd5e0; /* Muted highlights */
+  /* --- Accent --- */
+  --md-accent: #2f5ad8;
+  --md-accent-soft: #e9eefc;
+  --md-accent-text: #ffffff;
+  --md-gold: #b98a1e;
 
-  /* --- Accents --- */
-  --md-gold: #d4af37; /* Elegant highlight (buttons, icons) */
-  --md-shadow: rgba(0, 0, 0, 0.3); /* Shadows for cards/elevation */
+  /* --- Lines & elevation --- */
+  --md-border: #e4e8ef;
+  --md-shadow: 0 4px 16px rgba(17, 24, 39, 0.06);
+  --md-shadow-lg: 0 10px 30px rgba(17, 24, 39, 0.1);
 }
 
 * {
@@ -26,16 +28,21 @@
   font-family: "Prompt", sans-serif;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background-color: var(--md-background);
-  color: var(--md-blue);
+  background-color: var(--md-bg);
+  color: var(--md-text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
-  max-width: 800px;
-  margin: auto;
-  padding: 2em;
-  padding-bottom: 4em;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem 5rem;
 }
 
 li {
@@ -49,5 +56,53 @@ a {
 
 img {
   width: 100%;
-  border-radius: 0.5em;
+  display: block;
+}
+
+/* --- Shared page header (back + icon + title) --- */
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+.back-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  color: var(--md-text);
+  font-size: 1.05rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--md-shadow);
+  transition: background 0.15s ease;
+}
+.back-btn:hover {
+  background: var(--md-surface-2);
+}
+.page-header .title-icon {
+  color: var(--md-accent);
+  font-size: 1.15rem;
+}
+.page-header h1 {
+  font-size: 1.35rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* --- Shared section titles --- */
+.section-title {
+  color: var(--md-text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+}
+.section-title .count {
+  color: var(--md-text-muted);
+  font-weight: 400;
+  margin-left: 0.35rem;
 }

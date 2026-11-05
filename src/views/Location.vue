@@ -1,42 +1,50 @@
 <template>
   <div class="container">
-    <div class="header">
-      <i class="fa-duotone fa-solid fa-angle-left" @click="router.go(-1)"></i>
-      <i class="fa-duotone fa-solid fa-location-dot"></i>
+    <div class="page-header">
+      <button class="back-btn" @click="router.go(-1)">
+        <i class="fa-duotone fa-solid fa-angle-left"></i>
+      </button>
+      <i class="fa-duotone fa-solid fa-location-dot title-icon"></i>
       <h1>{{ locName }}</h1>
     </div>
 
     <template v-if="loc">
-      <div class="map-block">
-        <h3>แผนที่</h3>
-        <div class="map-wrap">
-          <img :src="loc.map" :alt="locName" />
+      <section class="map-card">
+        <div class="map-head">
+          <h3 class="section-title" style="margin: 0">แผนที่</h3>
           <router-link to="/map" class="map-full">
             <i class="fa-duotone fa-solid fa-expand"></i> แผนที่ภาพรวม
           </router-link>
         </div>
-      </div>
+        <div class="map-img">
+          <img :src="loc.map" :alt="locName" />
+        </div>
+      </section>
 
-      <div class="programs">
-        <h3>กำหนดการ ({{ sorted.length }} รายการ)</h3>
-        <div class="time-slots" v-if="sorted.length">
+      <section class="schedule">
+        <h3 class="section-title">
+          กำหนดการ
+          <span class="count">({{ sorted.length }} รายการ)</span>
+        </h3>
+
+        <div v-if="sorted.length" class="slots">
           <div v-for="slot in slots" :key="slot.label" class="slot">
-            <div class="slot-label">{{ slot.label }}</div>
-            <div
-              v-for="ev in slot.events"
-              :key="ev.Id"
-              class="event"
-            >
-              <div class="event-title">{{ ev.Title }}</div>
-              <div class="event-meta">{{ slot.from }} – {{ slot.to }}</div>
+            <div class="slot-time">{{ slot.label }}</div>
+            <div class="events">
+              <div v-for="ev in slot.events" :key="ev.Id" class="event">
+                <div class="event-dot"></div>
+                <div class="event-title">{{ ev.Title }}</div>
+                <div class="event-meta">{{ slot.from }} – {{ slot.to }}</div>
+              </div>
             </div>
           </div>
         </div>
-        <h3 v-else class="empty">ยังไม่มีกำหนดการ</h3>
-      </div>
+
+        <div v-else class="empty">ยังไม่มีกำหนดการ</div>
+      </section>
     </template>
 
-    <h3 v-else>ไม่พบสถานที่นี้</h3>
+    <div v-else class="empty">ไม่พบสถานที่นี้</div>
   </div>
 </template>
 
@@ -86,63 +94,93 @@ const slots = computed(() => {
 </script>
 
 <style scoped>
-.header {
+.map-card {
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 1rem;
+  padding: 1.1rem;
+  box-shadow: var(--md-shadow);
+  margin-bottom: 2rem;
+}
+.map-head {
   display: flex;
   align-items: center;
-  margin-bottom: 1em;
-  gap: 0.5em;
-}
-i {
-  margin-top: 0.15em;
-  font-size: 1.5em;
-}
-h3 {
-  color: var(--md-white);
-  margin-bottom: 0.5em;
-}
-.map-wrap {
-  position: relative;
-  margin-bottom: 1.5em;
+  justify-content: space-between;
+  margin-bottom: 0.85rem;
 }
 .map-full {
-  position: absolute;
-  top: 0.5em;
-  right: 0.5em;
-  background: rgba(15, 28, 51, 0.85);
-  padding: 0.35em 0.7em;
-  border-radius: 0.5em;
-  font-size: 0.85em;
-  color: var(--md-white);
-  border: 1px solid var(--md-gray-dark);
+  font-size: 0.9rem;
+  color: var(--md-accent);
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
 }
-.slot {
-  margin-bottom: 1em;
+.map-img {
+  border-radius: 0.75rem;
+  overflow: hidden;
+  border: 1px solid var(--md-border);
+  background: var(--md-surface-2);
 }
-.slot-label {
-  font-weight: 700;
-  color: var(--md-gold);
-  padding: 0.3em 0.5em;
-  background: var(--md-blue-darker);
-  border-radius: 0.5em;
-  margin-bottom: 0.35em;
+.map-img img {
+  min-height: 180px;
+  object-fit: cover;
+}
+
+.schedule .slots {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+.slot-time {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--md-accent);
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.slot-time::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--md-border);
+}
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
 }
 .event {
-  background: var(--md-blue-dark);
-  padding: 0.7em;
-  border-radius: 0.5em;
-  margin-bottom: 0.4em;
-  color: var(--md-gray);
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 0.85rem;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  box-shadow: var(--md-shadow);
+}
+.event-dot {
+  width: 0.65rem;
+  height: 0.65rem;
+  border-radius: 50%;
+  background: var(--md-accent);
+  margin-top: 0.45rem;
+  flex-shrink: 0;
 }
 .event-title {
-  color: var(--md-white);
+  font-weight: 500;
+  color: var(--md-text);
 }
 .event-meta {
-  font-size: 0.85em;
-  color: var(--md-gray-light);
-  margin-top: 0.2em;
+  font-size: 0.85rem;
+  color: var(--md-text-muted);
+  margin-top: 0.15rem;
 }
 .empty {
-  color: var(--md-gray);
-  font-weight: 400;
+  color: var(--md-text-muted);
+  padding: 2rem 0;
 }
 </style>
