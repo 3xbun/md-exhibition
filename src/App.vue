@@ -6,7 +6,7 @@
       class="signup-btn my-badge-btn"
     >
       <i class="fa-duotone fa-solid fa-id-badge"></i>
-      <span>{{ myBadge.name }}</span>
+      <span>{{ th.my_badge }}</span>
     </router-link>
     <router-link
       v-else-if="!['/register', '/admin', '/staff'].includes($route.path)"
