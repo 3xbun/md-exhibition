@@ -64,13 +64,26 @@ export async function findParentByBadgeCode(badgeCode) {
   return res.data?.records?.[0] ?? null;
 }
 
-/** All children (Members records) linked to a parent record id. */
+/** All children (Members records) linked to a parent record id.
+ *  Enriched with full member fields (name, class) since the links
+ *  endpoint only returns a partial projection (StudentID). */
 export async function getChildren(parentId) {
   const res = await axios.get(
     `${BASE}/v3/data/${BASE_ID}/${PARENTS}/links/${CHILD_LINK_FIELD}/${parentId}`,
     { headers: hdrs() }
   );
-  return res.data?.records ?? [];
+  const links = res.data?.records ?? [];
+  if (!links.length) return [];
+  const where = links
+    .map((l) => `(Id,eq,${l.id})`)
+    .join("~or");
+  const full = await axios.get(
+    `${BASE}/v3/data/${BASE_ID}/${MEMBERS}/records`,
+    { params: { where, limit: "50" }, headers: hdrs() }
+  );
+  const byId = Object.fromEntries((full.data?.records ?? []).map((r) => [r.id, r]));
+  // preserve link order
+  return links.map((l) => byId[l.id] ?? { id: l.id, fields: { StudentID: l.fields?.StudentID } });
 }
 
 /** All registered badges (parents + guests). */

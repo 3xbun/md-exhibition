@@ -16,8 +16,13 @@
     </div>
     <div class="badge-code">{{ parent.BadgeCode }}</div>
     <div class="badge-children" v-if="children.length">
-      <span class="badge-label">{{ th.child_label }}</span>
-      <span v-for="kid in children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
+      <span class="badge-label">{{ th.guardian_label }}</span>
+      <div v-for="kid in children" :key="kid.id" class="kid">
+        <span class="kid-name">
+          {{ kid.fields?.FirstName }} {{ kid.fields?.LastName }}
+        </span>
+        <span class="kid-meta">{{ kid.fields?.StudentID }} · {{ kid.fields?.Classroom }}</span>
+      </div>
     </div>
     <canvas ref="qrCanvas"></canvas>
     <div class="badge-url">{{ badgeUrl }}</div>
@@ -124,6 +129,20 @@ watch(() => props.parent?.BadgeCode, draw);
 .badge-label {
   font-size: 0.8rem;
   opacity: 0.8;
+}
+.kid {
+  margin-top: 0.45rem;
+}
+.kid-name {
+  display: block;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+.kid-meta {
+  display: block;
+  font-size: 0.85rem;
+  opacity: 0.85;
+  letter-spacing: 0.02em;
 }
 .chip {
   background: rgba(255, 255, 255, 0.2);
