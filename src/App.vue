@@ -1,5 +1,13 @@
 <template>
   <div class="app-shell">
+    <router-link
+      v-if="$route.path !== '/register'"
+      to="/register"
+      class="signup-btn print-hide"
+    >
+      <i class="fa-duotone fa-solid fa-id-badge"></i>
+      <span>{{ th.register_btn }}</span>
+    </router-link>
     <div class="app-main">
       <router-view />
     </div>
@@ -11,6 +19,7 @@
 import axios from "axios";
 import { onMounted, provide, ref } from "vue";
 import Footer from "./components/Footer.vue";
+import { th } from "./copy/th.js";
 
 const events = ref([]);
 provide("events", events);
@@ -29,3 +38,34 @@ onMounted(() => {
     .catch((err) => console.error(err));
 });
 </script>
+
+<style scoped>
+.signup-btn {
+  position: fixed;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 50;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.05rem;
+  border-radius: 999px;
+  background: var(--md-surface);
+  color: var(--md-accent);
+  border: 1px solid var(--md-border);
+  font-size: 0.9rem;
+  font-weight: 600;
+  box-shadow: var(--md-shadow);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.signup-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--md-shadow-lg);
+}
+
+@media print {
+  .print-hide {
+    display: none !important;
+  }
+}
+</style>
