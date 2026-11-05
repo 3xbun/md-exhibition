@@ -80,7 +80,7 @@ const programCount = (name) =>
   box-shadow: var(--md-shadow-lg);
 }
 .logo img {
-  border-radius: 50%;
+  padding-top: 5%;
 }
 .hero-title {
   font-size: clamp(1.9rem, 5vw, 2.6rem);
