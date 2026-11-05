@@ -6,16 +6,16 @@
           <img src="/imgs/logo-alternate.png" alt="" />
         </div>
         <h1 class="hero-title">MD Exhibition</h1>
-        <p class="hero-sub">งานนิทรรศการประจำปี <br />โรงเรียนมาแตร์เดอีวิทยาลัย</p>
+        <p class="hero-sub">{{ t("hero.sub") }}</p>
 
         <div class="hero-actions">
           <router-link to="/map" class="action-btn">
             <i class="fa-duotone fa-solid fa-map-location-dot"></i>
-            <span>แผนที่</span>
+            <span>{{ t("actions.map") }}</span>
           </router-link>
           <router-link to="/search" class="action-btn alt">
             <i class="fa-duotone fa-solid fa-address-card"></i>
-            <span>ค้นหานักเรียน</span>
+            <span>{{ t("actions.search") }}</span>
           </router-link>
         </div>
       </div>
@@ -23,7 +23,7 @@
 
     <main class="container">
       <section class="locations">
-        <h2 class="section-title">สถานที่จัดกิจกรรม</h2>
+        <h2 class="section-title">{{ t("home.locations") }}</h2>
         <div class="loc-grid">
           <router-link
             v-for="loc in locations"
@@ -40,7 +40,7 @@
               </span>
             </div>
             <div class="loc-name">{{ loc.name }}</div>
-            <div class="loc-count">{{ programCount(loc.name) }} รายการ</div>
+            <div class="loc-count">{{ t("count.items", { count: programCount(loc.name) }) }}</div>
           </router-link>
         </div>
       </section>
@@ -50,13 +50,14 @@
 
 <script setup>
 import { inject } from "vue";
+import { useI18n } from "vue-i18n";
 import { locations } from "../data/locations.js";
 
+const { t } = useI18n();
 const events = inject("events");
 
 const programCount = (name) =>
   events.value.filter((e) => e.Location === name).length;
-
 </script>
 
 <style scoped>
@@ -92,6 +93,7 @@ const programCount = (name) =>
   font-size: 1.05rem;
   font-weight: 300;
   opacity: 0.92;
+  white-space: pre-line;
 }
 .hero-actions {
   display: flex;
@@ -122,8 +124,6 @@ const programCount = (name) =>
   color: #fff;
   backdrop-filter: blur(4px);
 }
-
-/* --- Hero nav already above; no old-style nav --- */
 
 /* --- Locations --- */
 .locations {

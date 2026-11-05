@@ -2,8 +2,7 @@
   <footer>
     <div class="container footer-inner">
       <span class="copy">
-        <i class="fa-light fa-copyright"></i> 2026 Mater Dei School |
-        All Rights Reserved
+        <i class="fa-light fa-copyright"></i> {{ t("footer.rights") }}
       </span>
       <span class="version">v{{ version }}</span>
     </div>
@@ -11,7 +10,9 @@
 </template>
 
 <script setup>
+import { useI18n } from "vue-i18n";
 import { version } from "../version.js";
+const { t } = useI18n();
 </script>
 
 <style scoped>
