@@ -1,6 +1,10 @@
 <template>
-  <router-view />
-  <Footer />
+  <div class="app-shell">
+    <div class="app-main">
+      <router-view />
+    </div>
+    <Footer />
+  </div>
 </template>
 
 <script setup>
