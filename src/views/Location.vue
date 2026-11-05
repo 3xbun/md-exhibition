@@ -27,7 +27,18 @@
           <span class="count">({{ sorted.length }} รายการ)</span>
         </h3>
 
-        <div v-if="sorted.length" class="slots">
+        <div v-if="allDay.length" class="slot all-day">
+          <div class="slot-time">{{ allDayLabel }}</div>
+          <div class="events">
+            <div v-for="ev in allDay" :key="ev.Id" class="event">
+              <div class="event-dot"></div>
+              <div class="event-title">{{ ev.Title }}</div>
+              <div class="event-meta">ตลอดทั้งวัน</div>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="slots.length" class="slots">
           <div v-for="slot in slots" :key="slot.label" class="slot">
             <div class="slot-time">{{ slot.label }}</div>
             <div class="events">
@@ -40,7 +51,7 @@
           </div>
         </div>
 
-        <div v-else class="empty">ยังไม่มีกำหนดการ</div>
+        <div v-if="!allDay.length && !slots.length" class="empty">ยังไม่มีกำหนดการ</div>
       </section>
     </template>
 
@@ -73,9 +84,16 @@ const sorted = computed(() =>
     )
 );
 
+// All-day events have no start/end time in NocoDB
+const allDay = computed(() => sorted.value.filter((e) => !e.StartTime));
+
+// Byte-correct Thai "ตลอดทั้งวัน" (sourced from the events spreadsheet)
+const allDayLabel = "\u0e15\u0e25\u0e2d\u0e14\u0e17\u0e31\u0e49\u0e07\u0e27\u0e31\u0e19";
+
 const slots = computed(() => {
   const map = new Map();
   for (const ev of sorted.value) {
+    if (!ev.StartTime) continue; // all-day events go in the allDay group
     const key = (ev.StartTime || "").slice(0, 5);
     if (!map.has(key)) map.set(key, []);
     map.get(key).push(ev);
@@ -146,6 +164,22 @@ const slots = computed(() => {
   flex: 1;
   height: 1px;
   background: var(--md-border);
+}
+.all-day {
+  background: var(--md-accent-soft);
+  border: 1px solid #cdd9f7;
+  border-radius: 1rem;
+  padding: 1rem 1.1rem;
+  margin-bottom: 1.25rem;
+}
+.all-day .slot-time {
+  color: var(--md-accent);
+}
+.all-day .event {
+  background: var(--md-surface);
+}
+.all-day .event-dot {
+  background: var(--md-gold);
 }
 .events {
   display: flex;
