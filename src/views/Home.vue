@@ -17,14 +17,6 @@
             <i class="fa-duotone fa-solid fa-address-card"></i>
             <span>ค้นหานักเรียน</span>
           </router-link>
-          <router-link to="/register" class="action-btn">
-            <i class="fa-duotone fa-solid fa-id-badge"></i>
-            <span>{{ th.parent_label }}</span>
-          </router-link>
-          <router-link to="/staff" class="action-btn alt">
-            <i class="fa-duotone fa-solid fa-qrcode"></i>
-            <span>{{ th.staff_label }}</span>
-          </router-link>
         </div>
       </div>
     </section>
@@ -59,7 +51,6 @@
 <script setup>
 import { inject } from "vue";
 import { locations } from "../data/locations.js";
-import { th } from "../copy/th.js";
 
 const events = inject("events");
 
