@@ -24,15 +24,14 @@
         <span class="kid-meta">{{ kid.fields?.StudentID }} · {{ kid.fields?.Classroom }}</span>
       </div>
     </div>
-    <canvas ref="qrCanvas"></canvas>
+    <QrCanvas :text="badgeUrl" size="220" class="badge-qr" />
     <div class="badge-url">{{ badgeUrl }}</div>
   </div>
 </template>
 
 <script setup>
-import * as QRCode from "qrcode";
-import { ref, onMounted, watch } from "vue";
 import { th } from "../copy/th.js";
+import QrCanvas from "./QrCanvas.vue";
 
 const props = defineProps({
   parent: { type: Object, required: true },
@@ -41,19 +40,6 @@ const props = defineProps({
 
 const QR_BASE = "https://md-exhibition.pages.dev";
 const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
-const qrCanvas = ref(null);
-
-const draw = () => {
-  if (!qrCanvas.value) return;
-  QRCode.toCanvas(qrCanvas.value, badgeUrl, {
-    width: 220,
-    margin: 1,
-    color: { dark: "#1b2436", light: "#ffffff" },
-  });
-};
-
-onMounted(draw);
-watch(() => props.parent?.BadgeCode, draw);
 </script>
 
 <style scoped>
@@ -151,8 +137,11 @@ watch(() => props.parent?.BadgeCode, draw);
   font-size: 0.85rem;
   font-weight: 600;
 }
-.badge canvas {
+.badge-qr {
+  display: block;
   margin: 1rem auto 0;
+}
+.badge-qr :deep(canvas) {
   background: #fff;
   border-radius: 0.6rem;
   padding: 0.4rem;

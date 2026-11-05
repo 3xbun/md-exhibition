@@ -41,7 +41,7 @@
       <!-- Share panel: QR of the badge URL for the recipient's phone -->
       <div class="share-card print-hide" v-if="shareOpen">
         <p class="share-sub">{{ th.share_sub }}</p>
-        <canvas ref="shareQr"></canvas>
+        <QrCanvas :text="badgeUrl" size="220" />
         <div class="share-url">{{ badgeUrl }}</div>
         <button v-if="isMine" class="sent-btn" @click="confirmSent">
           <i class="fa-duotone fa-solid fa-check"></i>
@@ -55,11 +55,11 @@
 </template>
 
 <script setup>
-import * as QRCode from "qrcode";
-import { ref, computed, onMounted, watch, nextTick } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
+import QrCanvas from "../components/QrCanvas.vue";
 import { th } from "../copy/th.js";
 import { findParentByBadgeCode, getChildren } from "../api/parents.js";
 import { hasMyBadge, removeMyBadge, saveMyBadge } from "../api/myBadge.js";
@@ -70,7 +70,6 @@ const children = ref([]);
 const loaded = ref(false);
 const isMine = ref(false);
 const shareOpen = ref(false);
-const shareQr = ref(null);
 const sentDone = ref(false);
 
 const QR_BASE = "https://md-exhibition.pages.dev";
@@ -115,20 +114,6 @@ const confirmSent = () => {
   sentDone.value = true;
   isMine.value = false;
 };
-
-// Draw the share QR when the panel opens (badge must be loaded first)
-watch(
-  () => [shareOpen.value, parent.value?.BadgeCode],
-  async ([open]) => {
-    if (!open || !shareQr.value || !parent.value?.BadgeCode) return;
-    await nextTick();
-    QRCode.toCanvas(shareQr.value, badgeUrl.value, {
-      width: 220,
-      margin: 1,
-      color: { dark: "#1b2436", light: "#ffffff" },
-    });
-  }
-);
 </script>
 
 <style scoped>
