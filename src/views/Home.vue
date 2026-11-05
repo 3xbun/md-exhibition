@@ -44,48 +44,19 @@
           </router-link>
         </div>
       </section>
-
-      <section class="messages">
-        <h2 class="section-title">ข้อความจากกลุ่มสาระของเรา</h2>
-        <div class="msg-grid">
-          <PostIt
-            class="post"
-            v-for="(msg, index) in msgs"
-            :key="index"
-            :seed="index"
-            :title="msg.Title"
-            :msg="msg.Message"
-          />
-        </div>
-      </section>
     </main>
   </div>
 </template>
 
 <script setup>
-import { inject, onMounted, ref } from "vue";
-import axios from "axios";
-import PostIt from "../components/PostIt.vue";
+import { inject } from "vue";
 import { locations } from "../data/locations.js";
 
 const events = inject("events");
-const msgs = ref([]);
 
 const programCount = (name) =>
   events.value.filter((e) => e.Location === name).length;
 
-onMounted(() => {
-  const options = {
-    method: "GET",
-    url: "https://ndb.3xbun.com/api/v2/tables/m238nf5zt2oz5a3/records",
-    params: { offset: "0", limit: "25", where: "", viewId: "vwinzzllft9ikpls" },
-    headers: { "xc-token": "3jFXBW3Q7u8bG1ITW0SevPfYNoi_mDfICFORPSkw" },
-  };
-  axios
-    .request(options)
-    .then((res) => (msgs.value = res.data.list))
-    .catch((err) => console.error(err));
-});
 </script>
 
 <style scoped>
@@ -206,20 +177,6 @@ onMounted(() => {
   margin-top: 0.25rem;
   color: var(--md-text-muted);
   font-size: 0.9rem;
-}
-
-/* --- Messages --- */
-.messages {
-  margin-top: 2.5rem;
-}
-.msg-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-.post {
-  flex: 1 1 260px;
-  min-width: 240px;
 }
 
 @media (max-width: 600px) {
