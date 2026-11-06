@@ -18,6 +18,7 @@ const routes = [
   { path: "/badge", name: "badges", component: Badge },
   { path: "/badge/:code", name: "badge", component: Badge },
   { path: "/admin", name: "admin", component: Admin },
+  { path: "/admin/scan", name: "staff-scan", component: StaffScan },
 ];
 
 const router = createRouter({
