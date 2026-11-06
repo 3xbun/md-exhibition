@@ -9,7 +9,7 @@
       <i class="fa-duotone fa-solid fa-house"></i>
     </router-link>
     <router-link
-      v-else-if="myBadge && !['/register', '/admin', '/staff'].includes($route.path)"
+      v-else-if="myBadge && !['/register', '/admin', '/admin/scan'].includes($route.path)"
       to="/badge"
       class="signup-btn my-badge-btn"
     >
@@ -17,7 +17,7 @@
       <span>{{ th.my_badge }}</span>
     </router-link>
     <router-link
-      v-else-if="!['/register', '/admin', '/staff'].includes($route.path)"
+      v-else-if="!['/register', '/admin', '/admin/scan'].includes($route.path)"
       to="/register"
       class="signup-btn"
     >

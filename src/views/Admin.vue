@@ -37,7 +37,7 @@
       </div>
 
       <p class="admin-sub">{{ th.admin_sub }}</p>
-      <router-link to="/staff" class="scan-link">
+      <router-link to="/admin/scan" class="scan-link">
         <i class="fa-duotone fa-solid fa-qrcode"></i>
         <span>{{ th.scan_link }}</span>
       </router-link>
