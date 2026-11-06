@@ -160,7 +160,7 @@ const formatDate = (iso) =>
 }
 .search-input {
   flex: 1;
-  padding: 0.8rem 1rem 0.8rem 0.4rem;
+  padding: 0.8rem 1rem 0.8rem 1.6rem;
   background: transparent;
   border: none;
   outline: none;
