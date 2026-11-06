@@ -26,8 +26,10 @@
     </div>
 
     <!-- Confirmation modal: pops over the camera; camera keeps running.
-         Confirm (or close) returns straight to scanning the next badge. -->
-    <div class="modal-backdrop" v-if="result">
+         Scanning ONLY looks the badge up — the check-in is written when
+         staff tap Confirm. Confirm (or backdrop tap) returns straight to
+         scanning the next badge. -->
+    <div class="modal-backdrop" v-if="result" @click.self="dismiss">
       <div class="result-card" role="dialog" aria-modal="true">
         <div class="result-icon" :class="result.ok ? 'ok' : 'no'">
           <i :class="result.ok ? 'fa-duotone fa-solid fa-circle-check' : 'fa-duotone fa-solid fa-circle-xmark'"></i>
@@ -44,16 +46,36 @@
           {{ th.child_label }}:
           <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
         </p>
-        <!-- Check-in status: stamped by this scan (first time) or kept from before -->
-        <div v-if="result.ok && result.checkedInAt" class="checkin-status">
+
+        <!-- Pending: scanned, waiting for staff to tap Confirm -->
+        <div v-if="result.ok && result.pending" class="pending-status">
+          <i class="fa-duotone fa-solid fa-hourglass-half spin"></i>
+          <span>{{ th.checkin_pending }}</span>
+        </div>
+        <!-- Writing: Confirm tapped, stamp in flight -->
+        <div v-else-if="result.ok && result.saving" class="pending-status">
+          <i class="fa-duotone fa-solid fa-circle-notch spin"></i>
+          <span>{{ th.checkin_pending }}</span>
+        </div>
+        <!-- Confirmed: stamped by this scan (first time) or kept from before -->
+        <div v-else-if="result.ok && result.checkedInAt" class="checkin-status">
           <i class="fa-duotone fa-solid fa-door-open"></i>
           <span>{{ th.checked_in_title }}</span>
           <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
         </div>
         <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
         <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
-        <button class="btn" @click="confirmResult">
-          <i class="fa-duotone fa-solid fa-check"></i>
+
+        <!-- Only actionable while awaiting staff confirmation.
+             (Unknown badge: no button — tap the backdrop to close.) -->
+        <button
+          v-if="result.ok && result.pending"
+          class="btn"
+          :disabled="result.saving"
+          @click="confirmResult"
+        >
+          <i v-if="result.saving" class="fa-duotone fa-solid fa-circle-notch spin"></i>
+          <i v-else class="fa-duotone fa-solid fa-check"></i>
           <span>{{ th.confirm_btn }}</span>
         </button>
       </div>
@@ -79,6 +101,7 @@ const result = ref(null);
 let scanner = null;
 let lastCode = "";
 let processing = false;
+let returnTimer = null;
 
 const startScan = () => {
   error.value = "";
@@ -111,8 +134,18 @@ const stopScan = () => {
   scanning.value = false;
 };
 
+// Scan = LOOKUP ONLY. Nothing is written until staff tap Confirm.
 const handleScan = async (raw) => {
   if (processing) return; // one badge at a time; camera keeps decoding meanwhile
+  const cur = result.value;
+  // A pending confirm is live — let staff act on it first; ignore this flash.
+  if (cur && cur.pending) return;
+  // A "checked in" flash is showing — don't clobber it; just extend its window.
+  if (cur && cur.ok && !cur.pending) {
+    clearTimeout(returnTimer);
+    returnTimer = setTimeout(returnToScan, 1500);
+    return;
+  }
   processing = true;
   try {
     // QR may hold the badge URL (https://.../badge/PA-XXXXXX) or a bare code
@@ -124,30 +157,21 @@ const handleScan = async (raw) => {
     if (!rec?.fields) {
       result.value = { ok: false };
     } else {
-      // Staff scan = check-in: stamp CheckedInAt on the badge (idempotent —
-      // a repeat scan keeps the original time and shows it instead).
       const kids = await getChildren(rec.id);
-      try {
-        const ci = await checkInParent(rec.id);
-        result.value = {
-          ok: true,
-          parent: rec.fields,
-          children: kids,
-          checkedInAt: ci.checkedInAt,
-          first: ci.first,
-        };
-      } catch (e) {
-        console.error(e);
-        result.value = {
-          ok: true,
-          parent: rec.fields,
-          children: kids,
-          checkedInAt: null,
-          first: true,
-          checkinError: true,
-        };
-      }
+      result.value = {
+        ok: true,
+        recordId: rec.id,
+        parent: rec.fields,
+        children: kids,
+        pending: true, // waiting for staff to tap Confirm
+        saving: false,
+        checkedInAt: rec.fields.CheckedInAt ?? null,
+        first: !rec.fields.CheckedInAt,
+      };
     }
+  } catch (e) {
+    console.error(e);
+    result.value = { ok: false };
   } finally {
     // Camera keeps running — the modal is an overlay, scanning never stops.
     processing = false;
@@ -157,13 +181,49 @@ const handleScan = async (raw) => {
 const formatTime = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
 
-// Confirm (or backdrop tap) closes the modal and returns straight to scanning.
-const confirmResult = () => {
+// Close the modal and go straight back to scanning. Guarded so a fresh
+// scan that has taken over the modal is not clobbered by an old timer.
+const returnToScan = () => {
+  if (result.value?.pending) return; // a pending confirm is live — let staff act on it
   result.value = null;
-  lastCode = ""; // allow re-scanning the same badge right away
+  lastCode = "";
 };
 
-onUnmounted(stopScan);
+// Staff tapped Confirm: WRITE the check-in (this is the only place the
+// database is touched), show the stamped result, then auto-return.
+const confirmResult = async () => {
+  const r = result.value;
+  if (!r || !r.ok || !r.pending || r.saving) return;
+  r.saving = true;
+  try {
+    const ci = await checkInParent(r.recordId);
+    r.checkedInAt = ci.checkedInAt;
+    r.first = ci.first;
+    r.checkinError = false;
+    r.pending = false;
+    // Brief "checked in" flash, then straight back to scanning.
+    clearTimeout(returnTimer);
+    returnTimer = setTimeout(returnToScan, 1500);
+  } catch (e) {
+    console.error(e);
+    r.checkinError = true;
+    // Keep the modal open so staff can see the error and retry.
+  } finally {
+    r.saving = false;
+  }
+};
+
+// Backdrop tap: close the modal WITHOUT checking in (cancel / skip).
+const dismiss = () => {
+  clearTimeout(returnTimer);
+  result.value = null;
+  lastCode = "";
+};
+
+onUnmounted(() => {
+  clearTimeout(returnTimer);
+  stopScan();
+});
 </script>
 
 <style scoped>
@@ -211,6 +271,10 @@ onUnmounted(stopScan);
   font-family: inherit;
   cursor: pointer;
   box-shadow: var(--md-shadow);
+}
+.btn:disabled {
+  opacity: 0.6;
+  cursor: wait;
 }
 .btn.alt {
   background: var(--md-surface-2);
@@ -294,6 +358,17 @@ onUnmounted(stopScan);
   font-size: 0.85rem;
   font-weight: 600;
 }
+.pending-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
 .checkin-status {
   display: inline-flex;
   align-items: center;
@@ -314,5 +389,16 @@ onUnmounted(stopScan);
   color: var(--md-text-soft);
   font-size: 0.9rem;
   margin: 0;
+}
+.spin {
+  animation: md-spin 1s linear infinite;
+}
+@keyframes md-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 </style>

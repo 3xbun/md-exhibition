@@ -55,4 +55,5 @@ export const th = {
   not_checked: "ยังไม่ได้เช็คอิน",
   checkin_failed: "บันทึกการเข้างานไม่สำเร็จ",
   confirm_btn: "ยืนยัน",
+  checkin_pending: "รอการยืนยันเช็คอิน",
 };
