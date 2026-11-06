@@ -2,3 +2,6 @@ node_modules
 dist
 .env
 .env.local
+# build-generated version stamp (rebuilt by scripts/version.mjs on every build)
+src/version.js
+.build-counter
