@@ -15,7 +15,6 @@ const routes = [
   { path: "/map", name: "map", component: Map },
   { path: "/search", name: "search", component: Search },
   { path: "/register", name: "register", component: RegisterParent },
-  { path: "/staff", name: "staff", component: StaffScan },
   { path: "/badge", name: "badges", component: Badge },
   { path: "/badge/:code", name: "badge", component: Badge },
   { path: "/admin", name: "admin", component: Admin },
