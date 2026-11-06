@@ -21,7 +21,10 @@
         <span class="kid-name">
           {{ kid.fields?.FirstName }} {{ kid.fields?.LastName }}
         </span>
-        <span class="kid-meta">{{ kid.fields?.StudentID }} · {{ kid.fields?.Classroom }}</span>
+        <span class="kid-tags">
+          <span v-if="kid.fields?.StudentID" class="kid-tag kid-tag-id">{{ kid.fields.StudentID }}</span>
+          <span v-if="kid.fields?.Classroom" class="kid-tag kid-tag-class">{{ kid.fields.Classroom }}</span>
+        </span>
       </div>
     </div>
     <QrCanvas :text="badgeUrl" size="220" class="badge-qr" />
@@ -121,18 +124,35 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
   opacity: 0.8;
 }
 .kid {
-  margin-top: 0.45rem;
+  margin-top: 0.75rem;
+  line-height: 1.4;
 }
 .kid-name {
   display: block;
   font-weight: 700;
-  font-size: 1.05rem;
+  font-size: 1.1rem;
 }
-.kid-meta {
-  display: block;
-  font-size: 0.85rem;
-  opacity: 0.85;
-  letter-spacing: 0.02em;
+.kid-tags {
+  display: flex;
+  justify-content: center;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+  flex-wrap: wrap;
+}
+.kid-tag {
+  display: inline-block;
+  border-radius: 999px;
+  padding: 0.15rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  background: rgba(255, 255, 255, 0.18);
+}
+.kid-tag-id {
+  border: 1px solid rgba(255, 255, 255, 0.5);
+}
+.kid-tag-class {
+  background: rgba(255, 255, 255, 0.32);
 }
 .chip {
   background: rgba(255, 255, 255, 0.2);
