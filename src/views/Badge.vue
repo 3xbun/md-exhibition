@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
@@ -118,18 +118,30 @@ onUnmounted(() => {
 const QR_BASE = "https://md-exhibition.pages.dev";
 const badgeUrl = computed(() => `${QR_BASE}/badge/${parent.value?.BadgeCode ?? ""}`);
 
-onMounted(async () => {
-  const code = String(route.params.code ?? "").trim();
-  if (code) {
-    isMine.value = hasMyBadge(code);
-    const rec = await findParentByBadgeCode(code);
-    if (rec?.fields) {
-      parent.value = rec.fields;
-      children.value = await getChildren(rec.id);
+// Load the badge for the current :code. Watched (not onMounted) because
+// /badge and /badge/:code share this component — a client-side nav from the
+// list reuses the component, so onMounted would not re-fire and the stale
+// "not found" state would remain until a hard refresh.
+watch(
+  () => String(route.params.code ?? "").trim(),
+  async (code) => {
+    parent.value = null;
+    children.value = [];
+    loaded.value = false;
+    shareOpen.value = false;
+    sentDone.value = false;
+    if (code) {
+      isMine.value = hasMyBadge(code);
+      const rec = await findParentByBadgeCode(code);
+      if (rec?.fields) {
+        parent.value = rec.fields;
+        children.value = await getChildren(rec.id);
+      }
     }
-  }
-  loaded.value = true;
-});
+    loaded.value = true;
+  },
+  { immediate: true }
+);
 
 const printBadge = () => window.print();
 
