@@ -47,4 +47,11 @@ export const th = {
   confirm_sent: "ส่งแล้ว - ลบบัตรผู้เข้าชมออกจากอุปกรณ์นี้",
   sent_done: "ลบบัตรผู้เข้าชมออกจากอุปกรณ์นี้แล้ว",
   save_here: "บันทึกบัตรผู้เข้าชมลงในอุปกรณ์นี้",
+  checked_in_title: "เช็คอินแล้ว",
+  checked_in_at: "เช็คอินเมื่อ",
+  already_checked: "เช็คอินไปแล้วก่อนหน้านี้",
+  badge_checked_status: "เช็คอินแล้ว",
+  col_checkin: "การเช็คอิน",
+  not_checked: "ยังไม่ได้เช็คอิน",
+  checkin_failed: "บันทึกการเข้างานไม่สำเร็จ",
 };

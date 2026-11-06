@@ -38,6 +38,7 @@
         <span>{{ th.col_type }}</span>
         <span>{{ th.col_code }}</span>
         <span>{{ th.col_child }}</span>
+        <span>{{ th.col_checkin }}</span>
         <span>{{ th.col_created }}</span>
       </div>
       <router-link
@@ -55,6 +56,13 @@
         <span class="c-code">{{ row.fields.BadgeCode }}</span>
         <span class="c-children">
           <span v-for="sid in row.childIds" :key="sid" class="chip">{{ sid }}</span>
+        </span>
+        <span class="c-checkin" :class="{ done: row.fields.CheckedInAt }">
+          <template v-if="row.fields.CheckedInAt">
+            <i class="fa-duotone fa-solid fa-circle-check"></i>
+            {{ formatDate(row.fields.CheckedInAt) }}
+          </template>
+          <template v-else>{{ th.not_checked }}</template>
         </span>
         <span class="c-date">{{ formatDate(row.fields.CreatedAt) }}</span>
       </router-link>
@@ -195,7 +203,7 @@ const formatDate = (iso) =>
 .thead,
 .trow {
   display: grid;
-  grid-template-columns: 2fr 1fr 1.2fr 1fr 1.2fr;
+  grid-template-columns: 2fr 1fr 1.2fr 1fr 1.2fr 1.2fr;
   gap: 0.75rem;
   align-items: center;
   padding: 0.8rem 1rem;
@@ -221,6 +229,18 @@ const formatDate = (iso) =>
   color: var(--md-accent);
   font-weight: 600;
   font-size: 0.9rem;
+}
+.c-checkin {
+  color: var(--md-text-muted);
+  font-size: 0.85rem;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+.c-checkin.done {
+  color: #2f9e63;
+  font-weight: 600;
 }
 .c-date {
   color: var(--md-text-muted);
@@ -268,6 +288,7 @@ const formatDate = (iso) =>
       "name type"
       "code code"
       "children children"
+      "checkin checkin"
       "date date";
     gap: 0.3rem;
     padding: 0.9rem 1rem;
@@ -283,6 +304,9 @@ const formatDate = (iso) =>
   }
   .c-children {
     grid-area: children;
+  }
+  .c-checkin {
+    grid-area: checkin;
   }
   .c-date {
     grid-area: date;

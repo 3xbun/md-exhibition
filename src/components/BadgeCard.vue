@@ -15,6 +15,10 @@
       </span>
     </div>
     <div class="badge-code">{{ parent.BadgeCode }}</div>
+    <div v-if="parent.CheckedInAt" class="badge-checkin">
+      <i class="fa-duotone fa-solid fa-door-open"></i>
+      <span>{{ th.badge_checked_status }} {{ formatTime(parent.CheckedInAt) }}</span>
+    </div>
     <div class="badge-children" v-if="children.length">
       <span class="badge-label">{{ th.guardian_label }}</span>
       <div v-for="kid in children" :key="kid.id" class="kid">
@@ -34,6 +38,7 @@
 
 <script setup>
 import { th } from "../copy/th.js";
+import dayjs from "dayjs";
 import QrCanvas from "./QrCanvas.vue";
 
 const props = defineProps({
@@ -43,6 +48,9 @@ const props = defineProps({
 
 const QR_BASE = "https://md-exhibition.pages.dev";
 const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
+
+const formatTime = (iso) =>
+  iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
 </script>
 
 <style scoped>
@@ -110,6 +118,18 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
   font-size: 0.95rem;
   letter-spacing: 0.12em;
   opacity: 0.9;
+}
+.badge-checkin {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.45rem;
+  background: rgba(47, 158, 99, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.85rem;
+  font-weight: 600;
 }
 .badge-children {
   display: flex;

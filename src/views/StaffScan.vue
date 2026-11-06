@@ -42,6 +42,14 @@
         {{ th.child_label }}:
         <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
       </p>
+      <!-- Check-in status: stamped by this scan (first time) or kept from before -->
+      <div v-if="result.ok && result.checkedInAt" class="checkin-status">
+        <i class="fa-duotone fa-solid fa-door-open"></i>
+        <span>{{ th.checked_in_title }}</span>
+        <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
+      </div>
+      <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
+      <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
       <button class="btn" @click="reset">
         <i class="fa-duotone fa-solid fa-rotate-left"></i>
         <span>{{ th.scan_btn }}</span>
@@ -53,18 +61,27 @@
 <script setup>
 import { Html5Qrcode } from "html5-qrcode";
 import { ref, onUnmounted } from "vue";
+import dayjs from "dayjs";
 import router from "../routers";
 import { th } from "../copy/th.js";
-import { findParentByBadgeCode, getChildren } from "../api/parents.js";
+import {
+  findParentByBadgeCode,
+  getChildren,
+  checkInParent,
+} from "../api/parents.js";
 
 const scanning = ref(false);
 const error = ref("");
 const result = ref(null);
 let scanner = null;
 let lastCode = "";
+let resumeTimer = null;
 
 const startScan = () => {
+  clearTimeout(resumeTimer);
+  resumeTimer = null;
   error.value = "";
+  lastCode = ""; // allow re-scanning the same badge right away
   scanner = new Html5Qrcode("qr-reader");
   scanner
     .start(
@@ -100,22 +117,55 @@ const handleScan = async (raw) => {
   const m = code.match(/badge\/([A-Za-z0-9-]+)/);
   if (m) code = m[1];
   code = code.replace(/^https?:\/\/[^\s]*?\/badge\//, "").split("?")[0];
+  stopScan();
   const rec = await findParentByBadgeCode(code);
   if (!rec?.fields) {
     result.value = { ok: false };
   } else {
-    result.value = { ok: true, parent: rec.fields, children: await getChildren(rec.id) };
+    // Staff scan = check-in: stamp CheckedInAt on the badge (idempotent —
+    // a repeat scan keeps the original time and shows it instead).
+    const kids = await getChildren(rec.id);
+    try {
+      const ci = await checkInParent(rec.id);
+      result.value = {
+        ok: true,
+        parent: rec.fields,
+        children: kids,
+        checkedInAt: ci.checkedInAt,
+        first: ci.first,
+      };
+    } catch (e) {
+      console.error(e);
+      result.value = {
+        ok: true,
+        parent: rec.fields,
+        children: kids,
+        checkedInAt: null,
+        first: true,
+        checkinError: true,
+      };
+    }
   }
-  stopScan();
+  // Auto-resume so staff can walk a line of badges without re-tapping.
+  // lastCode dedupe + the idempotent stamp make a double-flash harmless.
+  clearTimeout(resumeTimer);
+  resumeTimer = setTimeout(startScan, 2000);
 };
 
+const formatTime = (iso) =>
+  iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
+
 const reset = () => {
+  clearTimeout(resumeTimer);
   result.value = null;
   lastCode = "";
   startScan();
 };
 
-onUnmounted(stopScan);
+onUnmounted(() => {
+  clearTimeout(resumeTimer);
+  stopScan();
+});
 </script>
 
 <style scoped>

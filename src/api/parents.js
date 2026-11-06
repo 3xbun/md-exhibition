@@ -108,6 +108,38 @@ export async function hasParentForMember(memberId) {
 }
 
 /**
+ * Record a staff check-in: stamp CheckedInAt (ISO UTC) on the parent record.
+ * Idempotent — if the badge was already checked in, keeps the original time.
+ * Returns { ok, checkedInAt, first } where `first` is true only for the
+ * first check-in of this badge.
+ */
+export async function checkInParent(parentId) {
+  const before = await findParentById(parentId);
+  if (before?.fields?.CheckedInAt) {
+    return { ok: true, checkedInAt: before.fields.CheckedInAt, first: false };
+  }
+  // Bulk-update form (single-element array) — the path-id PATCH route does
+  // not exist on this NocoDB build.
+  const res = await axios.patch(
+    `${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`,
+    [{ id: Number(parentId), fields: { CheckedInAt: new Date().toISOString() } }],
+    { headers: hdrs() }
+  );
+  const updated = res.data?.records?.[0]?.fields?.CheckedInAt;
+  if (!updated) throw new Error("Check-in update failed");
+  return { ok: true, checkedInAt: updated, first: true };
+}
+
+/** Find a parent record by numeric id. Returns the record or null. */
+export async function findParentById(parentId) {
+  const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`, {
+    params: { where: `(Id,eq,${Number(parentId)})` },
+    headers: hdrs(),
+  });
+  return res.data?.records?.[0] ?? null;
+}
+
+/**
  * Unique badge code per type: PA-XXXXXXXX / GU-XXXXXXXX
  * (random 6 alphanumeric, no 0/O/1/I). Checked against existing badges.
  */
