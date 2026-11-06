@@ -1,85 +1,90 @@
 <template>
   <div class="container">
-    <div class="page-header">
-      <button class="back-btn" @click="router.go(-1)">
-        <i class="fa-duotone fa-solid fa-angle-left"></i>
-      </button>
-      <i class="fa-duotone fa-solid fa-qrcode title-icon"></i>
-      <h1>{{ th.scan_title }}</h1>
-    </div>
-
-    <!-- Camera: runs indefinitely while the scan session is open -->
-    <div class="scan-card">
-      <p class="scan-sub">{{ th.scan_sub }}</p>
-      <div id="qr-reader" class="reader"></div>
-      <div class="scan-actions">
-        <button v-if="!scanning" class="btn" @click="startScan">
-          <i class="fa-duotone fa-solid fa-camera"></i>
-          <span>{{ th.scan_btn }}</span>
+    <!-- Shared 6-digit PIN gate (same one as /admin). The scanner and its
+         confirmation modal only render after the gate passes, so nobody
+         can scan / check in without the PIN. -->
+    <AdminPinGate>
+      <div class="page-header">
+        <button class="back-btn" @click="router.go(-1)">
+          <i class="fa-duotone fa-solid fa-angle-left"></i>
         </button>
-        <button v-else class="btn alt" @click="stopScan">
-          <i class="fa-duotone fa-solid fa-stop"></i>
-          <span>{{ th.stop_btn }}</span>
-        </button>
-        <p v-if="error" class="error">{{ error }}</p>
+        <i class="fa-duotone fa-solid fa-qrcode title-icon"></i>
+        <h1>{{ th.scan_title }}</h1>
       </div>
-    </div>
 
-    <!-- Confirmation modal: pops over the camera; camera keeps running.
-         Scanning ONLY looks the badge up — the check-in is written when
-         staff tap Confirm. Confirm (or backdrop tap) returns straight to
-         scanning the next badge. -->
-    <div class="modal-backdrop" v-if="result" @click.self="dismiss">
-      <div class="result-card" role="dialog" aria-modal="true">
-        <div class="result-icon" :class="result.ok ? 'ok' : 'no'">
-          <i :class="result.ok ? 'fa-duotone fa-solid fa-circle-check' : 'fa-duotone fa-solid fa-circle-xmark'"></i>
+      <!-- Camera: runs indefinitely while the scan session is open -->
+      <div class="scan-card">
+        <p class="scan-sub">{{ th.scan_sub }}</p>
+        <div id="qr-reader" class="reader"></div>
+        <div class="scan-actions">
+          <button v-if="!scanning" class="btn" @click="startScan">
+            <i class="fa-duotone fa-solid fa-camera"></i>
+            <span>{{ th.scan_btn }}</span>
+          </button>
+          <button v-else class="btn alt" @click="stopScan">
+            <i class="fa-duotone fa-solid fa-stop"></i>
+            <span>{{ th.stop_btn }}</span>
+          </button>
+          <p v-if="error" class="error">{{ error }}</p>
         </div>
-        <h2 class="result-title">
-          {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
-        </h2>
-        <p v-if="result.ok" class="result-type" :class="result.parent.Type">
-          <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
-          {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
-        </p>
-        <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
-        <p v-if="result.ok && result.children.length" class="result-kids">
-          {{ th.child_label }}:
-          <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
-        </p>
-
-        <!-- Pending: scanned, waiting for staff to tap Confirm -->
-        <div v-if="result.ok && result.pending" class="pending-status">
-          <i class="fa-duotone fa-solid fa-hourglass-half spin"></i>
-          <span>{{ th.checkin_pending }}</span>
-        </div>
-        <!-- Writing: Confirm tapped, stamp in flight -->
-        <div v-else-if="result.ok && result.saving" class="pending-status">
-          <i class="fa-duotone fa-solid fa-circle-notch spin"></i>
-          <span>{{ th.checkin_pending }}</span>
-        </div>
-        <!-- Confirmed: stamped by this scan (first time) or kept from before -->
-        <div v-else-if="result.ok && result.checkedInAt" class="checkin-status">
-          <i class="fa-duotone fa-solid fa-door-open"></i>
-          <span>{{ th.checked_in_title }}</span>
-          <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
-        </div>
-        <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
-        <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
-
-        <!-- Only actionable while awaiting staff confirmation.
-             (Unknown badge: no button — tap the backdrop to close.) -->
-        <button
-          v-if="result.ok && result.pending"
-          class="btn"
-          :disabled="result.saving"
-          @click="confirmResult"
-        >
-          <i v-if="result.saving" class="fa-duotone fa-solid fa-circle-notch spin"></i>
-          <i v-else class="fa-duotone fa-solid fa-check"></i>
-          <span>{{ th.confirm_btn }}</span>
-        </button>
       </div>
-    </div>
+
+      <!-- Confirmation modal: pops over the camera; camera keeps running.
+           Scanning ONLY looks the badge up — the check-in is written when
+           staff tap Confirm. Confirm (or backdrop tap) returns straight to
+           scanning the next badge. -->
+      <div class="modal-backdrop" v-if="result" @click.self="dismiss">
+        <div class="result-card" role="dialog" aria-modal="true">
+          <div class="result-icon" :class="result.ok ? 'ok' : 'no'">
+            <i :class="result.ok ? 'fa-duotone fa-solid fa-circle-check' : 'fa-duotone fa-solid fa-circle-xmark'"></i>
+          </div>
+          <h2 class="result-title">
+            {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
+          </h2>
+          <p v-if="result.ok" class="result-type" :class="result.parent.Type">
+            <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
+            {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
+          </p>
+          <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
+          <p v-if="result.ok && result.children.length" class="result-kids">
+            {{ th.child_label }}:
+            <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
+          </p>
+
+          <!-- Pending: scanned, waiting for staff to tap Confirm -->
+          <div v-if="result.ok && result.pending" class="pending-status">
+            <i class="fa-duotone fa-solid fa-hourglass-half spin"></i>
+            <span>{{ th.checkin_pending }}</span>
+          </div>
+          <!-- Writing: Confirm tapped, stamp in flight -->
+          <div v-else-if="result.ok && result.saving" class="pending-status">
+            <i class="fa-duotone fa-solid fa-circle-notch spin"></i>
+            <span>{{ th.checkin_pending }}</span>
+          </div>
+          <!-- Confirmed: stamped by this scan (first time) or kept from before -->
+          <div v-else-if="result.ok && result.checkedInAt" class="checkin-status">
+            <i class="fa-duotone fa-solid fa-door-open"></i>
+            <span>{{ th.checked_in_title }}</span>
+            <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
+          </div>
+          <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
+          <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
+
+          <!-- Only actionable while awaiting staff confirmation.
+               (Unknown badge: no button — tap the backdrop to close.) -->
+          <button
+            v-if="result.ok && result.pending"
+            class="btn"
+            :disabled="result.saving"
+            @click="confirmResult"
+          >
+            <i v-if="result.saving" class="fa-duotone fa-solid fa-circle-notch spin"></i>
+            <i v-else class="fa-duotone fa-solid fa-check"></i>
+            <span>{{ th.confirm_btn }}</span>
+          </button>
+        </div>
+      </div>
+    </AdminPinGate>
   </div>
 </template>
 
@@ -89,6 +94,7 @@ import { ref, onUnmounted } from "vue";
 import dayjs from "dayjs";
 import router from "../routers";
 import { th } from "../copy/th.js";
+import AdminPinGate from "../components/AdminPinGate.vue";
 import {
   findParentByBadgeCode,
   getChildren,

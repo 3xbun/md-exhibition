@@ -1,33 +1,9 @@
 <template>
   <div class="container">
-    <!-- PIN gate: the only thing between the public URL and the badge list.
-         Only the SHA-256 hash of the PIN lives in the bundle (never the
-         PIN itself); a successful unlock is kept for the browser session. -->
-    <div v-if="!unlocked" class="lock">
-      <i class="fa-duotone fa-solid fa-lock lock-icon"></i>
-      <h1 class="lock-title">{{ th.lock_title }}</h1>
-      <p class="lock-sub">{{ th.lock_sub }}</p>
-      <form class="lock-form" @submit.prevent="tryUnlock">
-        <input
-          v-model="pin"
-          type="password"
-          inputmode="numeric"
-          autocomplete="one-time-code"
-          maxlength="6"
-          class="lock-input"
-          :placeholder="th.pin_ph"
-          :disabled="busy"
-          autofocus
-        />
-        <button class="btn" type="submit" :disabled="busy || pin.length < 6">
-          <i class="fa-duotone fa-solid fa-unlock-keyhole"></i>
-          <span>{{ th.unlock_btn }}</span>
-        </button>
-      </form>
-      <p v-if="wrong" class="lock-error">{{ th.pin_wrong }}</p>
-    </div>
-
-    <template v-else>
+    <!-- Shared 6-digit PIN gate (also guards /admin/scan). The slot content
+         is the only thing rendered after the gate passes; the badge list is
+         fetched only once it's unlocked. -->
+    <AdminPinGate @unlocked="load">
       <div class="page-header">
         <button class="back-btn" @click="router.go(-1)">
           <i class="fa-duotone fa-solid fa-angle-left"></i>
@@ -98,7 +74,7 @@
 
       <p v-else-if="loaded && !query" class="no-result">{{ th.empty }}</p>
       <p v-else-if="loaded && query" class="no-result">{{ th.admin_no_match }}</p>
-    </template>
+    </AdminPinGate>
   </div>
 </template>
 
@@ -107,52 +83,9 @@ import { ref, computed, onMounted } from "vue";
 import router from "../routers";
 import dayjs from "dayjs";
 import { th } from "../copy/th.js";
+import AdminPinGate from "../components/AdminPinGate.vue";
+import { isUnlocked } from "../api/adminAuth.js";
 import { listParents, getChildren } from "../api/parents.js";
-
-// ---- PIN gate ----------------------------------------------------------
-// 6-digit staff PIN. Only its SHA-256 (hex) is shipped in the bundle —
-// the PIN itself is never in the source. Comparison is constant-time so
-// the hash is not revealed byte-by-byte by response timing.
-const PIN_HASH = "b7289491b0a241c4955a8aafbb4935693cb1de5ad7b4efa01d2623ed1a138a50";
-const UNLOCK_KEY = "md-exhibition.admin-unlocked"; // sessionStorage (per-tab)
-
-const pin = ref("");
-const wrong = ref(false);
-const busy = ref(false);
-const unlocked = ref(sessionStorage.getItem(UNLOCK_KEY) === "1");
-
-const sha256Hex = async (text) => {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
-  return Array.from(new Uint8Array(buf))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("");
-};
-
-const ctEqual = (a, b) => {
-  if (a.length !== b.length) return false;
-  let diff = 0;
-  for (let i = 0; i < a.length; i++) diff |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return diff === 0;
-};
-
-const tryUnlock = async () => {
-  if (busy.value) return;
-  busy.value = true;
-  try {
-    const hash = await sha256Hex(pin.value.trim());
-    if (ctEqual(hash, PIN_HASH)) {
-      sessionStorage.setItem(UNLOCK_KEY, "1");
-      unlocked.value = true;
-      await load();
-    } else {
-      wrong.value = true;
-      pin.value = "";
-    }
-  } finally {
-    busy.value = false;
-  }
-};
-// ------------------------------------------------------------------------
 
 const rows = ref([]);
 const loaded = ref(false);
@@ -186,8 +119,9 @@ async function loadChildren(ids) {
   return out;
 }
 
-// Data loads ONLY after a successful PIN unlock (the list is the protected
-// part; the gate itself needs no network).
+// Data loads ONLY after the PIN gate has passed (this session, on first
+// entry). The gate emits 'unlocked' on a fresh unlock; on a refresh with an
+// existing unlock we load on mount.
 async function load() {
   if (loaded.value) return;
   loaded.value = true; // set first: the v-if on the table handles the empty state
@@ -201,7 +135,7 @@ async function load() {
 }
 
 onMounted(() => {
-  if (unlocked.value) load();
+  if (isUnlocked()) load();
 });
 
 const formatDate = (iso) =>
@@ -209,80 +143,6 @@ const formatDate = (iso) =>
 </script>
 
 <style scoped>
-/* PIN gate (the only view before a correct 6-digit PIN) */
-.lock {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.9rem;
-  padding: 3.5rem 1rem;
-  max-width: 420px;
-  margin: 0 auto;
-  text-align: center;
-}
-.lock-icon {
-  font-size: 2.6rem;
-  color: var(--md-accent);
-}
-.lock-title {
-  font-size: 1.5rem;
-  font-weight: 700;
-  margin: 0;
-}
-.lock-sub {
-  color: var(--md-text-soft);
-  margin: 0;
-}
-.lock-form {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  width: 100%;
-}
-.lock-input {
-  padding: 0.85rem 1rem;
-  border: 1px solid var(--md-border);
-  border-radius: 999px;
-  background: var(--md-surface);
-  box-shadow: var(--md-shadow);
-  font-size: 1.15rem;
-  font-family: inherit;
-  font-weight: 600;
-  letter-spacing: 0.3em;
-  text-align: center;
-  color: var(--md-text);
-  outline: none;
-  min-height: 52px;
-}
-.lock-input:focus {
-  border-color: var(--md-accent);
-}
-.lock-form .btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.55rem;
-  padding: 0.8rem 1.6rem;
-  border: none;
-  border-radius: 999px;
-  background: var(--md-accent);
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 600;
-  font-family: inherit;
-  cursor: pointer;
-  box-shadow: var(--md-shadow);
-}
-.lock-form .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-.lock-error {
-  color: #c0392b;
-  font-size: 0.9rem;
-  font-weight: 600;
-  margin: 0;
-}
 .admin-sub {
   color: var(--md-text-soft);
   margin-bottom: 0.75rem;
