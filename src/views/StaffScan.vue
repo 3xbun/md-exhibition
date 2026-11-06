@@ -8,8 +8,8 @@
       <h1>{{ th.scan_title }}</h1>
     </div>
 
-    <!-- Camera -->
-    <div class="scan-card" v-if="!result">
+    <!-- Camera: runs indefinitely while the scan session is open -->
+    <div class="scan-card">
       <p class="scan-sub">{{ th.scan_sub }}</p>
       <div id="qr-reader" class="reader"></div>
       <div class="scan-actions">
@@ -25,35 +25,38 @@
       </div>
     </div>
 
-    <!-- Result -->
-    <div class="result-card" v-else>
-      <div class="result-icon" :class="result.ok ? 'ok' : 'no'">
-        <i :class="result.ok ? 'fa-duotone fa-solid fa-circle-check' : 'fa-duotone fa-solid fa-circle-xmark'"></i>
+    <!-- Confirmation modal: pops over the camera; camera keeps running.
+         Confirm (or close) returns straight to scanning the next badge. -->
+    <div class="modal-backdrop" v-if="result">
+      <div class="result-card" role="dialog" aria-modal="true">
+        <div class="result-icon" :class="result.ok ? 'ok' : 'no'">
+          <i :class="result.ok ? 'fa-duotone fa-solid fa-circle-check' : 'fa-duotone fa-solid fa-circle-xmark'"></i>
+        </div>
+        <h2 class="result-title">
+          {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
+        </h2>
+        <p v-if="result.ok" class="result-type" :class="result.parent.Type">
+          <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
+          {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
+        </p>
+        <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
+        <p v-if="result.ok && result.children.length" class="result-kids">
+          {{ th.child_label }}:
+          <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
+        </p>
+        <!-- Check-in status: stamped by this scan (first time) or kept from before -->
+        <div v-if="result.ok && result.checkedInAt" class="checkin-status">
+          <i class="fa-duotone fa-solid fa-door-open"></i>
+          <span>{{ th.checked_in_title }}</span>
+          <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
+        </div>
+        <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
+        <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
+        <button class="btn" @click="confirmResult">
+          <i class="fa-duotone fa-solid fa-check"></i>
+          <span>{{ th.confirm_btn }}</span>
+        </button>
       </div>
-      <h2 class="result-title">
-        {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
-      </h2>
-      <p v-if="result.ok" class="result-type" :class="result.parent.Type">
-        <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
-        {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
-      </p>
-      <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
-      <p v-if="result.ok && result.children.length" class="result-kids">
-        {{ th.child_label }}:
-        <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
-      </p>
-      <!-- Check-in status: stamped by this scan (first time) or kept from before -->
-      <div v-if="result.ok && result.checkedInAt" class="checkin-status">
-        <i class="fa-duotone fa-solid fa-door-open"></i>
-        <span>{{ th.checked_in_title }}</span>
-        <span class="checkin-time">{{ formatTime(result.checkedInAt) }}</span>
-      </div>
-      <p v-if="result.ok && !result.first" class="checkin-again">{{ th.already_checked }} — {{ formatTime(result.checkedInAt) }}</p>
-      <p v-if="result.ok && result.checkinError" class="error">{{ th.checkin_failed }}</p>
-      <button class="btn" @click="reset">
-        <i class="fa-duotone fa-solid fa-rotate-left"></i>
-        <span>{{ th.scan_btn }}</span>
-      </button>
     </div>
   </div>
 </template>
@@ -75,13 +78,10 @@ const error = ref("");
 const result = ref(null);
 let scanner = null;
 let lastCode = "";
-let resumeTimer = null;
+let processing = false;
 
 const startScan = () => {
-  clearTimeout(resumeTimer);
-  resumeTimer = null;
   error.value = "";
-  lastCode = ""; // allow re-scanning the same badge right away
   scanner = new Html5Qrcode("qr-reader");
   scanner
     .start(
@@ -112,60 +112,58 @@ const stopScan = () => {
 };
 
 const handleScan = async (raw) => {
-  // QR may hold the badge URL (https://.../badge/PA-XXXXXX) or a bare code
-  let code = String(raw).trim();
-  const m = code.match(/badge\/([A-Za-z0-9-]+)/);
-  if (m) code = m[1];
-  code = code.replace(/^https?:\/\/[^\s]*?\/badge\//, "").split("?")[0];
-  stopScan();
-  const rec = await findParentByBadgeCode(code);
-  if (!rec?.fields) {
-    result.value = { ok: false };
-  } else {
-    // Staff scan = check-in: stamp CheckedInAt on the badge (idempotent —
-    // a repeat scan keeps the original time and shows it instead).
-    const kids = await getChildren(rec.id);
-    try {
-      const ci = await checkInParent(rec.id);
-      result.value = {
-        ok: true,
-        parent: rec.fields,
-        children: kids,
-        checkedInAt: ci.checkedInAt,
-        first: ci.first,
-      };
-    } catch (e) {
-      console.error(e);
-      result.value = {
-        ok: true,
-        parent: rec.fields,
-        children: kids,
-        checkedInAt: null,
-        first: true,
-        checkinError: true,
-      };
+  if (processing) return; // one badge at a time; camera keeps decoding meanwhile
+  processing = true;
+  try {
+    // QR may hold the badge URL (https://.../badge/PA-XXXXXX) or a bare code
+    let code = String(raw).trim();
+    const m = code.match(/badge\/([A-Za-z0-9-]+)/);
+    if (m) code = m[1];
+    code = code.replace(/^https?:\/\/[^\s]*?\/badge\//, "").split("?")[0];
+    const rec = await findParentByBadgeCode(code);
+    if (!rec?.fields) {
+      result.value = { ok: false };
+    } else {
+      // Staff scan = check-in: stamp CheckedInAt on the badge (idempotent —
+      // a repeat scan keeps the original time and shows it instead).
+      const kids = await getChildren(rec.id);
+      try {
+        const ci = await checkInParent(rec.id);
+        result.value = {
+          ok: true,
+          parent: rec.fields,
+          children: kids,
+          checkedInAt: ci.checkedInAt,
+          first: ci.first,
+        };
+      } catch (e) {
+        console.error(e);
+        result.value = {
+          ok: true,
+          parent: rec.fields,
+          children: kids,
+          checkedInAt: null,
+          first: true,
+          checkinError: true,
+        };
+      }
     }
+  } finally {
+    // Camera keeps running — the modal is an overlay, scanning never stops.
+    processing = false;
   }
-  // Auto-resume so staff can walk a line of badges without re-tapping.
-  // lastCode dedupe + the idempotent stamp make a double-flash harmless.
-  clearTimeout(resumeTimer);
-  resumeTimer = setTimeout(startScan, 2000);
 };
 
 const formatTime = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
 
-const reset = () => {
-  clearTimeout(resumeTimer);
+// Confirm (or backdrop tap) closes the modal and returns straight to scanning.
+const confirmResult = () => {
   result.value = null;
-  lastCode = "";
-  startScan();
+  lastCode = ""; // allow re-scanning the same badge right away
 };
 
-onUnmounted(() => {
-  clearTimeout(resumeTimer);
-  stopScan();
-});
+onUnmounted(stopScan);
 </script>
 
 <style scoped>
@@ -223,6 +221,22 @@ onUnmounted(() => {
   font-size: 0.9rem;
 }
 
+/* Confirmation modal over the live camera */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+.modal-backdrop .result-card {
+  box-shadow: var(--md-shadow-lg);
+  margin: 0;
+  width: 100%;
+}
 .result-card {
   text-align: center;
   display: flex;
@@ -279,5 +293,26 @@ onUnmounted(() => {
   padding: 0.15rem 0.7rem;
   font-size: 0.85rem;
   font-weight: 600;
+}
+.checkin-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(47, 158, 99, 0.12);
+  border: 1px solid rgba(47, 158, 99, 0.45);
+  color: #247a4b;
+  border-radius: 999px;
+  padding: 0.35rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.checkin-time {
+  color: var(--md-text-soft);
+  font-weight: 500;
+}
+.checkin-again {
+  color: var(--md-text-soft);
+  font-size: 0.9rem;
+  margin: 0;
 }
 </style>
