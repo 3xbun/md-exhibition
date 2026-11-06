@@ -113,18 +113,17 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
 }
 .badge-children {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  flex-wrap: wrap;
-  margin-top: 0.6rem;
+  gap: 0.35rem;
+  margin-top: 0.9rem;
 }
 .badge-label {
   font-size: 0.8rem;
   opacity: 0.8;
 }
 .kid {
-  margin-top: 0.75rem;
+  margin-top: 0.25rem;
   line-height: 1.4;
 }
 .kid-name {
