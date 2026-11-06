@@ -1,5 +1,5 @@
 <template>
-  <div class="badge">
+  <div class="badge" :class="parent.Type">
     <div class="badge-head">
       <img src="/imgs/logo-alternate.png" alt="" class="badge-logo" />
       <div>
@@ -53,6 +53,10 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
   padding: 1.5rem;
   text-align: center;
 }
+/* Color-coded by type: parent = blue, guest = gold */
+.badge.guest {
+  background: linear-gradient(160deg, var(--md-gold) 0%, #7d5510 100%);
+}
 .badge-head {
   display: flex;
   align-items: center;
@@ -96,7 +100,7 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
   font-weight: 600;
 }
 .badge-type-chip.guest {
-  background: rgba(185, 138, 30, 0.4);
+  background: rgba(255, 255, 255, 0.35);
 }
 .badge-code {
   margin-top: 0.25rem;

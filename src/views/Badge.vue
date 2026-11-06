@@ -16,6 +16,7 @@
           :key="b.code"
           :to="`/badge/${encodeURIComponent(b.code)}`"
           class="badge-row"
+          :class="b.type === 'guest' ? 'row-guest' : 'row-parent'"
         >
           <i
             class="fa-duotone fa-solid"
@@ -239,6 +240,19 @@ const confirmSent = () => {
   font-size: 0.75rem;
   letter-spacing: 0.06em;
   color: var(--md-text-muted);
+}
+/* Color-coded by type (matches the badge card) */
+.badge-row.row-parent {
+  border-left: 4px solid var(--md-accent);
+}
+.badge-row.row-parent i {
+  color: var(--md-accent);
+}
+.badge-row.row-guest {
+  border-left: 4px solid var(--md-gold);
+}
+.badge-row.row-guest i {
+  color: var(--md-gold);
 }
 .badge-row-x {
   border: none;
