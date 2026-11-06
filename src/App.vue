@@ -1,7 +1,15 @@
 <template>
   <div class="app-shell">
     <router-link
-      v-if="myBadge && !['/register', '/admin', '/staff'].includes($route.path)"
+      v-if="$route.path.startsWith('/badge')"
+      to="/"
+      class="signup-btn home-btn"
+      aria-label="Home"
+    >
+      <i class="fa-duotone fa-solid fa-house"></i>
+    </router-link>
+    <router-link
+      v-else-if="myBadge && !['/register', '/admin', '/staff'].includes($route.path)"
       to="/badge"
       class="signup-btn my-badge-btn"
     >
@@ -102,6 +110,14 @@ onMounted(() => {
   overflow: hidden;
   text-overflow: ellipsis;
   max-width: 160px;
+}
+.home-btn {
+  background: var(--md-accent);
+  color: #fff;
+  border-color: var(--md-accent);
+  padding: 0.55rem;
+  gap: 0;
+  font-size: 1rem;
 }
 @media (max-width: 600px) {
   /* Icon-only on phones */
