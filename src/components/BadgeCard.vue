@@ -115,7 +115,6 @@ const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.35rem;
   margin-top: 0.9rem;
 }
 .badge-label {
