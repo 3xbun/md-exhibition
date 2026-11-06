@@ -5,7 +5,7 @@
         <i class="fa-duotone fa-solid fa-angle-left"></i>
       </button>
       <i class="fa-duotone fa-solid fa-users-gear title-icon"></i>
-      <h1>{{ th.admin_title }} <span class="count">{{ rows.length }} {{ th.total_label }}</span></h1>
+      <h1>{{ th.admin_title }} <span class="count">{{ filtered.length }} {{ th.total_label }}</span></h1>
     </div>
 
     <p class="admin-sub">{{ th.admin_sub }}</p>
@@ -14,7 +14,25 @@
       <span>{{ th.scan_link }}</span>
     </router-link>
 
-    <div class="admin-table" v-if="rows.length">
+    <div class="admin-search">
+      <i class="fa-duotone fa-solid fa-magnifying-glass search-icon"></i>
+      <input
+        type="text"
+        class="search-input"
+        :placeholder="th.admin_search_ph"
+        v-model="query"
+      />
+      <button
+        v-if="query"
+        class="search-clear"
+        @click="query = ''"
+        :aria-label="'clear'"
+      >
+        <i class="fa-duotone fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <div class="admin-table" v-if="filtered.length">
       <div class="thead">
         <span>{{ th.col_name }}</span>
         <span>{{ th.col_type }}</span>
@@ -23,7 +41,7 @@
         <span>{{ th.col_created }}</span>
       </div>
       <router-link
-        v-for="row in rows"
+        v-for="row in filtered"
         :key="row.id"
         :to="`/badge/${encodeURIComponent(row.fields.BadgeCode)}`"
         class="trow"
@@ -42,12 +60,13 @@
       </router-link>
     </div>
 
-    <p v-else-if="loaded" class="no-result">{{ th.empty }}</p>
+    <p v-else-if="loaded && !query" class="no-result">{{ th.empty }}</p>
+    <p v-else-if="loaded && query" class="no-result">{{ th.admin_no_match }}</p>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import router from "../routers";
 import dayjs from "dayjs";
 import { th } from "../copy/th.js";
@@ -55,6 +74,17 @@ import { listParents, getChildren } from "../api/parents.js";
 
 const rows = ref([]);
 const loaded = ref(false);
+const query = ref("");
+
+// Client-side name filter (list is already loaded in memory).
+const filtered = computed(() => {
+  const q = query.value.trim().toLowerCase();
+  if (!q) return rows.value;
+  return rows.value.filter((r) => {
+    const name = `${r.fields.FirstName ?? ""} ${r.fields.LastName ?? ""}`.toLowerCase();
+    return name.includes(q);
+  });
+});
 
 // Fetch children per badge with limited concurrency (API rate-limits bursts)
 async function loadChildren(ids) {
@@ -111,6 +141,49 @@ const formatDate = (iso) =>
   font-weight: 600;
   margin-bottom: 1.25rem;
   box-shadow: var(--md-shadow);
+}
+.admin-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 999px;
+  box-shadow: var(--md-shadow);
+  max-width: 560px;
+  margin: 0 0 1rem;
+}
+.search-icon {
+  padding: 0 0 0 1.1rem;
+  color: var(--md-text-muted);
+  font-size: 0.9rem;
+}
+.search-input {
+  flex: 1;
+  padding: 0.8rem 1rem 0.8rem 0.4rem;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--md-text);
+  font-size: 1rem;
+  font-family: inherit;
+  min-width: 0;
+}
+.search-input::placeholder {
+  color: var(--md-text-muted);
+}
+.search-clear {
+  border: none;
+  background: none;
+  color: var(--md-text-muted);
+  cursor: pointer;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.9rem;
+}
+.search-clear:hover {
+  background: var(--md-surface-2);
+  color: var(--md-text);
 }
 .admin-table {
   border: 1px solid var(--md-border);
