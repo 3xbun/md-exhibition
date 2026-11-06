@@ -26,7 +26,7 @@ export const locations = [
     icon: "fa-palette",
   },
   {
-    name: "Workshopโรงยิมฯ",
+    name: "Workshop โรงยิมฯ",
     map: "/imgs/maps/map-gymnasium.jpeg",
     icon: "fa-dumbbell",
   },
