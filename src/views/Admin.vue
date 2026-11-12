@@ -13,10 +13,16 @@
       </div>
 
       <p class="admin-sub">{{ th.admin_sub }}</p>
-      <router-link to="/admin/scan" class="scan-link">
-        <i class="fa-duotone fa-solid fa-qrcode"></i>
-        <span>{{ th.scan_link }}</span>
-      </router-link>
+      <div class="scan-links">
+        <router-link to="/admin/scan" class="scan-link">
+          <i class="fa-duotone fa-solid fa-qrcode"></i>
+          <span>{{ th.scan_link }}</span>
+        </router-link>
+        <router-link to="/admin/traffic" class="scan-link">
+          <i class="fa-duotone fa-solid fa-chart-column"></i>
+          <span>{{ th.traffic_title }}</span>
+        </router-link>
+      </div>
 
       <div class="admin-search">
         <i class="fa-duotone fa-solid fa-magnifying-glass search-icon"></i>
@@ -152,6 +158,12 @@ const formatDate = (iso) =>
   font-size: 1rem;
   font-weight: 400;
 }
+.scan-links {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
 .scan-link {
   display: inline-flex;
   align-items: center;
@@ -162,7 +174,6 @@ const formatDate = (iso) =>
   color: #fff;
   font-size: 0.95rem;
   font-weight: 600;
-  margin-bottom: 1.25rem;
   box-shadow: var(--md-shadow);
 }
 .admin-search {

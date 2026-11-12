@@ -8,6 +8,8 @@ import RegisterParent from "../views/RegisterParent.vue";
 import StaffScan from "../views/StaffScan.vue";
 import Badge from "../views/Badge.vue";
 import Admin from "../views/Admin.vue";
+import AdminTraffic from "../views/AdminTraffic.vue";
+import Stage from "../views/Stage.vue";
 
 const routes = [
   { path: "/", name: "home", component: Home },
@@ -19,6 +21,8 @@ const routes = [
   { path: "/badge/:code", name: "badge", component: Badge },
   { path: "/admin", name: "admin", component: Admin },
   { path: "/admin/scan", name: "staff-scan", component: StaffScan },
+  { path: "/admin/traffic", name: "admin-traffic", component: AdminTraffic },
+  { path: "/stage/:name", name: "stage", component: Stage },
 ];
 
 const router = createRouter({
