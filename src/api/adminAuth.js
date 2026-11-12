@@ -4,7 +4,7 @@
 // never appears in source. A successful unlock is kept for the browser
 // session (per-tab sessionStorage) so staff don't re-enter it per page.
 export const PIN_HASH =
-  "b7289491b0a241c4955a8aafbb4935693cb1de5ad7b4efa01d2623ed1a138a50";
+  "bdeaaf6d0e1fd3a4b5fef6862f76f19e9cb9305ccb02d6067402ccc51fdc8ee8";
 
 const UNLOCK_KEY = "md-exhibition.admin-unlocked";
 
