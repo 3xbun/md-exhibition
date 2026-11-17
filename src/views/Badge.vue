@@ -65,6 +65,10 @@
         <i class="fa-duotone fa-solid fa-xmark"></i>
         <span>{{ th.badge_removed }}</span>
       </button>
+      <button class="add-btn print-hide" @click="router.push('/register')">
+        <i class="fa-duotone fa-solid fa-plus"></i>
+        <span>{{ th.add_badge }}</span>
+      </button>
 
       <!-- Share panel: QR of the badge URL for the recipient's phone -->
       <div class="share-card print-hide" v-if="shareOpen">
@@ -351,6 +355,24 @@ const confirmSent = () => {
   font-weight: 600;
   font-family: inherit;
   cursor: pointer;
+}
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--md-accent);
+  border-radius: 999px;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.add-btn:hover {
+  transform: translateY(-1px);
 }
 
 @media print {
