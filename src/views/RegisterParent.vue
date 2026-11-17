@@ -97,6 +97,10 @@
         <i class="fa-duotone fa-solid fa-print"></i>
         <span>{{ th.print_btn }}</span>
       </button>
+      <button class="add-btn print-hide" @click="resetForm">
+        <i class="fa-duotone fa-solid fa-plus"></i>
+        <span>{{ th.add_badge }}</span>
+      </button>
     </div>
   </div>
 </template>
@@ -215,6 +219,19 @@ const register = async () => {
 };
 
 const printBadge = () => window.print();
+
+const resetForm = () => {
+  registered.value = null;
+  children.value = [];
+  firstName.value = "";
+  lastName.value = "";
+  studentID.value = "";
+  phone.value = "";
+  foundStudent.value = null;
+  searched.value = false;
+  alreadyCount.value = 0;
+  error.value = "";
+};
 
 watch(studentID, (v) => {
   if (badgeType.value !== "parent") return;
@@ -407,6 +424,24 @@ watch(studentID, (v) => {
   font-family: inherit;
   cursor: pointer;
   box-shadow: var(--md-shadow);
+}
+.add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.7rem 1.4rem;
+  border: 1px solid var(--md-accent);
+  border-radius: 999px;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+.add-btn:hover {
+  transform: translateY(-1px);
 }
 
 @media print {

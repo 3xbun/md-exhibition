@@ -34,6 +34,12 @@
         </router-link>
       </div>
       <p v-else class="no-result">{{ th.badge_list_empty }}</p>
+      <div class="list-actions print-hide">
+        <button class="add-btn" @click="router.push('/register')">
+          <i class="fa-duotone fa-solid fa-plus"></i>
+          <span>{{ th.add_badge }}</span>
+        </button>
+      </div>
     </div>
 
     <div class="badge-wrap" v-else-if="parent">
@@ -215,6 +221,11 @@ const confirmSent = () => {
   width: 100%;
   max-width: 440px;
   margin: 0 auto;
+}
+.list-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
 }
 .badge-row {
   display: flex;
