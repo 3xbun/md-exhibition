@@ -49,7 +49,16 @@
         </label>
         <label class="field" v-else>
           <span>{{ th.phone }}</span>
-          <input v-model.trim="phone" type="tel" required />
+          <input
+            :value="phone"
+            @input="onPhoneInput"
+            type="tel"
+            inputmode="numeric"
+            placeholder="0xx-xxx-xxxx"
+            pattern="\d{3}-\d{3}-\d{4}"
+            maxlength="12"
+            required
+          />
         </label>
 
         <p v-if="badgeType === 'parent' && foundStudent" class="found-student">
@@ -64,7 +73,7 @@
         <button
           type="submit"
           class="register-btn"
-          :disabled="(badgeType === 'parent' ? !foundStudent : !phone) || busy"
+          :disabled="(badgeType === 'parent' ? !foundStudent : phone.length < 12) || busy"
         >
           <i class="fa-duotone fa-solid fa-id-badge"></i>
           <span>{{ th.register_btn }}</span>
@@ -112,6 +121,19 @@ const lastName = ref("");
 const studentID = ref("");
 const phone = ref("");
 const badgeType = ref("parent"); // "parent" | "guest"
+
+const formatPhone = (raw) => {
+  const d = String(raw ?? "").replace(/\D/g, "").slice(0, 10);
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 6)}-${d.slice(6)}`;
+};
+
+const onPhoneInput = (e) => {
+  const formatted = formatPhone(e.target.value);
+  phone.value = formatted;
+  e.target.value = formatted;
+};
 const foundStudent = ref(null);
 const searched = ref(false);
 const alreadyCount = ref(0);
