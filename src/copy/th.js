@@ -7,6 +7,7 @@ export const th = {
   first_name: "ชื่อ",
   last_name: "นามสกุล",
   student_id: "รหัสนักเรียนของบุตรหลาน",
+  phone: "เบอร์โทรศัพท์",
   register_btn: "ลงทะเบียน",
   find_student: "ค้นหานักเรียนก่อน",
   badge_list: "บัตรที่บันทึกไว้",

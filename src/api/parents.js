@@ -29,16 +29,16 @@ export async function findMemberByStudentID(studentID) {
 
 /** Create a parent/guest record (and link child when type is parent). */
 export async function createParent(parent, memberId) {
+  const fields = {
+    FirstName: parent.FirstName,
+    LastName: parent.LastName,
+    BadgeCode: parent.BadgeCode,
+    Type: parent.Type,
+  };
+  if (parent.Phone) fields.Phone = parent.Phone;
   const res = await axios.post(
     `${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`,
-    {
-      fields: {
-        FirstName: parent.FirstName,
-        LastName: parent.LastName,
-        BadgeCode: parent.BadgeCode,
-        Type: parent.Type,
-      },
-    },
+    { fields },
     { headers: hdrs() }
   );
   const parentRecord = res.data?.records?.[0];

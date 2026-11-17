@@ -66,6 +66,9 @@
           <span class="c-code">{{ row.fields.BadgeCode }}</span>
           <span class="c-children">
             <span v-for="sid in row.childIds" :key="sid" class="chip">{{ sid }}</span>
+            <span v-if="!row.childIds.length && row.fields.Phone" class="chip">
+              <i class="fa-duotone fa-solid fa-phone"></i> {{ row.fields.Phone }}
+            </span>
           </span>
           <span class="c-checkin" :class="{ done: row.fields.CheckedInAt }">
             <template v-if="row.fields.CheckedInAt">

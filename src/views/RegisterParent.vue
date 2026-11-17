@@ -47,6 +47,10 @@
           <span>{{ th.student_id }}</span>
           <input v-model.trim="studentID" required />
         </label>
+        <label class="field" v-else>
+          <span>{{ th.phone }}</span>
+          <input v-model.trim="phone" type="tel" required />
+        </label>
 
         <p v-if="badgeType === 'parent' && foundStudent" class="found-student">
           <i class="fa-duotone fa-solid fa-circle-check"></i>
@@ -60,7 +64,7 @@
         <button
           type="submit"
           class="register-btn"
-          :disabled="(badgeType === 'parent' && !foundStudent) || busy"
+          :disabled="(badgeType === 'parent' ? !foundStudent : !phone) || busy"
         >
           <i class="fa-duotone fa-solid fa-id-badge"></i>
           <span>{{ th.register_btn }}</span>
@@ -106,6 +110,7 @@ import { saveMyBadge } from "../api/myBadge.js";
 const firstName = ref("");
 const lastName = ref("");
 const studentID = ref("");
+const phone = ref("");
 const badgeType = ref("parent"); // "parent" | "guest"
 const foundStudent = ref(null);
 const searched = ref(false);
@@ -166,6 +171,7 @@ const register = async () => {
         LastName: lastName.value,
         BadgeCode: code,
         Type: badgeType.value,
+        Phone: badgeType.value === "guest" ? phone.value : undefined,
       },
       badgeType.value === "parent" ? foundStudent.value.Id : null
     );

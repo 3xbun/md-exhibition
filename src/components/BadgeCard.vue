@@ -15,6 +15,10 @@
       </span>
     </div>
     <div class="badge-code">{{ parent.BadgeCode }}</div>
+    <div v-if="parent.Phone" class="badge-phone">
+      <i class="fa-duotone fa-solid fa-phone"></i>
+      <span>{{ parent.Phone }}</span>
+    </div>
     <div v-if="parent.CheckedInAt" class="badge-checkin">
       <i class="fa-duotone fa-solid fa-door-open"></i>
       <span>{{ th.badge_checked_status }} {{ formatTime(parent.CheckedInAt) }}</span>
@@ -117,6 +121,14 @@ const formatTime = (iso) =>
   margin-top: 0.25rem;
   font-size: 0.95rem;
   letter-spacing: 0.12em;
+  opacity: 0.9;
+}
+.badge-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
   opacity: 0.9;
 }
 .badge-checkin {

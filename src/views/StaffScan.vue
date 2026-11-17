@@ -50,6 +50,10 @@
             {{ th.child_label }}:
             <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>
           </p>
+          <p v-else-if="result.ok && result.parent.Phone" class="result-kids">
+            <i class="fa-duotone fa-solid fa-phone"></i>
+            <span>{{ result.parent.Phone }}</span>
+          </p>
 
           <!-- Pending: scanned, waiting for staff to tap Confirm -->
           <div v-if="result.ok && result.pending" class="pending-status">
