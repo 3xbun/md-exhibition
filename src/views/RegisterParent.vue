@@ -376,10 +376,12 @@ watch(studentID, (v) => {
   border-color: var(--md-accent);
   background: var(--md-surface);
 }
-.classnum-prefix {
+.classnum-wrap .classnum-prefix {
   display: flex;
   align-items: center;
-  padding: 0 0.9rem;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  line-height: normal;
   font-weight: 700;
   letter-spacing: 0.06em;
   color: var(--md-accent);
@@ -389,6 +391,7 @@ watch(studentID, (v) => {
 .classnum-wrap input {
   flex: 1;
   width: 100%;
+  height: 100%;
   border: none;
   background: transparent;
   outline: none;
