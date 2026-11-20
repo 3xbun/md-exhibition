@@ -41,9 +41,9 @@
           <h2 class="result-title">
             {{ result.ok ? result.parent.FirstName + " " + result.parent.LastName : th.not_found }}
           </h2>
-          <p v-if="result.ok" class="result-type" :class="result.parent.Type">
-            <i :class="result.parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
-            {{ result.parent.Type === 'guest' ? th.guest_label : th.parent_label }}
+          <p v-if="result.ok" class="result-type" :class="result.parent.Type === 'parent' ? '' : 'guest'">
+            <i :class="scanTypeIcon(result.parent.Type)"></i>
+            {{ scanTypeLabel(result.parent.Type) }}
           </p>
           <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
           <p v-if="result.ok && result.children.length" class="result-kids">
@@ -190,6 +190,20 @@ const handleScan = async (raw) => {
 
 const formatTime = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
+
+// Type chip on the scan result (parent blue / outside + alumni gold).
+const scanTypeLabel = (t) =>
+  t === "alumni"
+    ? th.alumni_label
+    : t === "outside" || t === "guest"
+      ? th.outside_label
+      : th.parent_label;
+const scanTypeIcon = (t) =>
+  t === "alumni"
+    ? "fa-duotone fa-solid fa-graduation-cap"
+    : t === "outside" || t === "guest"
+      ? "fa-duotone fa-solid fa-user-group"
+      : "fa-duotone fa-solid fa-user-shield";
 
 // Close the modal and go straight back to scanning. Guarded so a fresh
 // scan that has taken over the modal is not clobbered by an old timer.

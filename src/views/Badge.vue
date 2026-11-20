@@ -16,11 +16,11 @@
           :key="b.code"
           :to="`/badge/${encodeURIComponent(b.code)}`"
           class="badge-row"
-          :class="b.type === 'guest' ? 'row-guest' : 'row-parent'"
+          :class="b.type === 'parent' ? 'row-parent' : 'row-guest'"
         >
           <i
             class="fa-duotone fa-solid"
-            :class="b.type === 'guest' ? 'fa-user-group' : 'fa-user-shield'"
+            :class="rowIcon(b.type)"
           ></i>
           <span class="badge-row-name">{{ b.name }}</span>
           <span class="badge-row-code">{{ b.code }}</span>
@@ -108,6 +108,13 @@ import {
 } from "../api/myBadge.js";
 
 const route = useRoute();
+// Row icon per badge type (parent blue / outside + alumni gold).
+const rowIcon = (type) =>
+  type === "alumni"
+    ? "fa-graduation-cap"
+    : type === "outside" || type === "guest"
+      ? "fa-user-group"
+      : "fa-user-shield";
 const parent = ref(null);
 const children = ref([]);
 const loaded = ref(false);

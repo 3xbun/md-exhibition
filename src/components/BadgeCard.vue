@@ -1,5 +1,5 @@
 <template>
-  <div class="badge" :class="parent.Type">
+  <div class="badge" :class="typeChipClass">
     <div class="badge-head">
       <img src="/imgs/logo-alternate.png" alt="" class="badge-logo" />
       <div>
@@ -9,9 +9,9 @@
     </div>
     <div class="badge-name">{{ parent.FirstName }} {{ parent.LastName }}</div>
     <div class="badge-type-row">
-      <span class="badge-type-chip" :class="parent.Type">
-        <i :class="parent.Type === 'guest' ? 'fa-duotone fa-solid fa-user-group' : 'fa-duotone fa-solid fa-user-shield'"></i>
-        {{ parent.Type === 'guest' ? th.guest_label : th.parent_label }}
+      <span class="badge-type-chip" :class="typeChipClass">
+        <i :class="typeIcon"></i>
+        {{ typeLabel }}
       </span>
     </div>
     <div class="badge-code">{{ parent.BadgeCode }}</div>
@@ -41,6 +41,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { th } from "../copy/th.js";
 import dayjs from "dayjs";
 import QrCanvas from "./QrCanvas.vue";
@@ -52,6 +53,29 @@ const props = defineProps({
 
 const QR_BASE = "https://md-exhibition.pages.dev";
 const badgeUrl = `${QR_BASE}/badge/${props.parent.BadgeCode}`;
+
+// Guest-style types (outside, alumni, and legacy 'guest') share the gold
+// theme; parent is blue.
+const typeLabel = computed(() => {
+  const t = props.parent.Type;
+  return t === "alumni"
+    ? th.alumni_label
+    : t === "outside" || t === "guest"
+      ? th.outside_label
+      : th.parent_label;
+});
+const typeIcon = computed(() => {
+  const t = props.parent.Type;
+  return t === "alumni"
+    ? "fa-duotone fa-solid fa-graduation-cap"
+    : t === "outside" || t === "guest"
+      ? "fa-duotone fa-solid fa-user-group"
+      : "fa-duotone fa-solid fa-user-shield";
+});
+// Root badge + chip class: parent -> default blue, guest-style -> gold.
+const typeChipClass = computed(() =>
+  props.parent.Type === "parent" ? "" : "guest"
+);
 
 const formatTime = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";

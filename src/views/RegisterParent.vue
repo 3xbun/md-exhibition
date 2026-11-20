@@ -10,7 +10,7 @@
 
     <!-- Registration form -->
     <div class="form-card print-hide" v-if="!registered">
-      <p class="form-sub">{{ badgeType === "guest" ? th.guest_sub : th.register_sub }}</p>
+      <p class="form-sub">{{ typeSub }}</p>
       <form @submit.prevent="register">
         <div class="type-toggle">
           <span class="type-label">{{ th.type_label }}</span>
@@ -27,11 +27,20 @@
             <button
               type="button"
               class="type-opt"
-              :class="{ active: badgeType === 'guest' }"
-              @click="badgeType = 'guest'"
+              :class="{ active: badgeType === 'outside' }"
+              @click="badgeType = 'outside'"
             >
               <i class="fa-duotone fa-solid fa-user-group"></i>
-              <span>{{ th.guest_label }}</span>
+              <span>{{ th.outside_label }}</span>
+            </button>
+            <button
+              type="button"
+              class="type-opt"
+              :class="{ active: badgeType === 'alumni' }"
+              @click="badgeType = 'alumni'"
+            >
+              <i class="fa-duotone fa-solid fa-graduation-cap"></i>
+              <span>{{ th.alumni_label }}</span>
             </button>
           </div>
         </div>
@@ -106,7 +115,7 @@
 </template>
 
 <script setup>
-import { ref, watch, onMounted, onUnmounted } from "vue";
+import { ref, computed, watch, onMounted, onUnmounted } from "vue";
 import router from "../routers";
 import BadgeCard from "../components/BadgeCard.vue";
 import { th } from "../copy/th.js";
@@ -124,7 +133,15 @@ const firstName = ref("");
 const lastName = ref("");
 const studentID = ref("");
 const phone = ref("");
-const badgeType = ref("parent"); // "parent" | "guest"
+const badgeType = ref("parent"); // "parent" | "outside" | "alumni"
+const typeSub = computed(
+  () =>
+    badgeType.value === "outside"
+      ? th.outside_sub
+      : badgeType.value === "alumni"
+        ? th.alumni_sub
+        : th.register_sub
+);
 
 const formatPhone = (raw) => {
   const d = String(raw ?? "").replace(/\D/g, "").slice(0, 10);
@@ -197,7 +214,8 @@ const register = async () => {
         LastName: lastName.value,
         BadgeCode: code,
         Type: badgeType.value,
-        Phone: badgeType.value === "guest" ? phone.value : undefined,
+        Phone:
+          badgeType.value !== "parent" ? phone.value : undefined,
       },
       badgeType.value === "parent" ? foundStudent.value.Id : null
     );
@@ -272,7 +290,7 @@ watch(studentID, (v) => {
 }
 .type-opts {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 0.5rem;
 }
 .type-opt {

@@ -59,8 +59,8 @@
         >
           <span class="c-name">{{ row.fields.FirstName }} {{ row.fields.LastName }}</span>
           <span>
-            <span class="type-chip" :class="row.fields.Type">
-              {{ row.fields.Type === "guest" ? th.guest_label : th.parent_label }}
+            <span class="type-chip" :class="typeChipClass(row.fields.Type)">
+              {{ typeLabel(row.fields.Type) }}
             </span>
           </span>
           <span class="c-code">{{ row.fields.BadgeCode }}</span>
@@ -149,6 +149,15 @@ onMounted(() => {
 
 const formatDate = (iso) =>
   iso ? dayjs(iso).format("DD/MM/YYYY HH:mm") : "";
+
+// Type chip: label text + CSS class (parent blue / outside + alumni gold).
+const typeLabel = (t) =>
+  t === "alumni"
+    ? th.alumni_label
+    : t === "outside" || t === "guest"
+      ? th.outside_label
+      : th.parent_label;
+const typeChipClass = (t) => (t === "parent" ? "" : "guest");
 </script>
 
 <style scoped>

@@ -140,12 +140,12 @@ export async function findParentById(parentId) {
 }
 
 /**
- * Unique badge code per type: PA-XXXXXXXX / GU-XXXXXXXX
+ * Unique badge code per type: PA-XXXXXXXX / GU-XXXXXXXX / AL-XXXXXXXX
  * (random 6 alphanumeric, no 0/O/1/I). Checked against existing badges.
  */
 export async function makeBadgeCode(type) {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O, 1/I
-  const prefix = type === "guest" ? "GU" : "PA";
+  const prefix = type === "guest" ? "GU" : type === "alumni" ? "AL" : "PA";
   for (;;) {
     let tail = "";
     for (let i = 0; i < 6; i++) tail += alpha[Math.floor(Math.random() * alpha.length)];
