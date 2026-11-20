@@ -36,6 +36,7 @@ export async function createParent(parent, memberId) {
     Type: parent.Type,
   };
   if (parent.Phone) fields.Phone = parent.Phone;
+  if (parent.ClassNumber) fields.ClassNumber = parent.ClassNumber;
   const res = await axios.post(
     `${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`,
     { fields },

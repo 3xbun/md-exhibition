@@ -69,6 +69,19 @@
             required
           />
         </label>
+        <label class="field" v-if="badgeType === 'alumni'">
+          <span>{{ th.classnum_label }}</span>
+          <div class="classnum-wrap">
+            <span class="classnum-prefix">MD</span>
+            <input
+              :value="classNum"
+              @input="onClassNumInput"
+              inputmode="numeric"
+              placeholder="101"
+              required
+            />
+          </div>
+        </label>
 
         <p v-if="badgeType === 'parent' && foundStudent" class="found-student">
           <i class="fa-duotone fa-solid fa-circle-check"></i>
@@ -133,6 +146,7 @@ const firstName = ref("");
 const lastName = ref("");
 const studentID = ref("");
 const phone = ref("");
+const classNum = ref(""); // alumni: number only (system shows the "MD" prefix)
 const badgeType = ref("parent"); // "parent" | "outside" | "alumni"
 const typeSub = computed(
   () =>
@@ -154,6 +168,12 @@ const onPhoneInput = (e) => {
   const formatted = formatPhone(e.target.value);
   phone.value = formatted;
   e.target.value = formatted;
+};
+// Class number: digits only (max 4), the "MD" prefix is shown separately.
+const onClassNumInput = (e) => {
+  const d = String(e.target.value ?? "").replace(/\D/g, "").slice(0, 4);
+  classNum.value = d;
+  e.target.value = d;
 };
 const foundStudent = ref(null);
 const searched = ref(false);
@@ -216,6 +236,8 @@ const register = async () => {
         Type: badgeType.value,
         Phone:
           badgeType.value !== "parent" ? phone.value : undefined,
+        ClassNumber:
+          badgeType.value === "alumni" ? `MD${classNum.value}` : undefined,
       },
       badgeType.value === "parent" ? foundStudent.value.Id : null
     );
@@ -245,6 +267,7 @@ const resetForm = () => {
   lastName.value = "";
   studentID.value = "";
   phone.value = "";
+  classNum.value = "";
   foundStudent.value = null;
   searched.value = false;
   alreadyCount.value = 0;
@@ -339,6 +362,40 @@ watch(studentID, (v) => {
 .field input:focus {
   border-color: var(--md-accent);
   background: var(--md-surface);
+}
+/* Class-number field (alumni): fixed "MD" prefix + digits-only input */
+.classnum-wrap {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--md-border);
+  border-radius: 0.7rem;
+  background: var(--md-bg);
+  overflow: hidden;
+}
+.classnum-wrap:focus-within {
+  border-color: var(--md-accent);
+  background: var(--md-surface);
+}
+.classnum-prefix {
+  display: flex;
+  align-items: center;
+  padding: 0 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--md-accent);
+  background: var(--md-accent-soft);
+  border-right: 1px solid var(--md-border);
+}
+.classnum-wrap input {
+  flex: 1;
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0.75rem 0.9rem;
+  font-size: 1rem;
+  font-family: inherit;
+  color: var(--md-text);
 }
 .found-student {
   display: flex;

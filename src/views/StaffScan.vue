@@ -46,6 +46,10 @@
             {{ scanTypeLabel(result.parent.Type) }}
           </p>
           <p v-if="result.ok" class="result-code">{{ result.parent.BadgeCode }}</p>
+          <p v-if="result.ok && result.parent.ClassNumber" class="result-kids">
+            <i class="fa-duotone fa-solid fa-building"></i>
+            <span>{{ th.classnum_label }}: {{ result.parent.ClassNumber }}</span>
+          </p>
           <p v-if="result.ok && result.children.length" class="result-kids">
             {{ th.child_label }}:
             <span v-for="kid in result.children" :key="kid.id" class="chip">{{ kid.fields?.StudentID }}</span>

@@ -15,6 +15,10 @@
       </span>
     </div>
     <div class="badge-code">{{ parent.BadgeCode }}</div>
+    <div v-if="parent.ClassNumber" class="badge-phone">
+      <i class="fa-duotone fa-solid fa-building"></i>
+      <span>{{ th.classnum_label }}: {{ parent.ClassNumber }}</span>
+    </div>
     <div v-if="parent.Phone" class="badge-phone">
       <i class="fa-duotone fa-solid fa-phone"></i>
       <span>{{ parent.Phone }}</span>
