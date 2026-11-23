@@ -146,7 +146,12 @@ export async function findParentById(parentId) {
  */
 export async function makeBadgeCode(type) {
   const alpha = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no 0/O, 1/I
-  const prefix = type === "guest" ? "GU" : type === "alumni" ? "AL" : "PA";
+  const prefix =
+    type === "alumni"
+      ? "AL"
+      : type === "parent"
+        ? "PA"
+        : "GU"; // outside + legacy guest
   for (;;) {
     let tail = "";
     for (let i = 0; i < 6; i++) tail += alpha[Math.floor(Math.random() * alpha.length)];
