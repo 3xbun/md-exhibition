@@ -5,14 +5,14 @@
         <button class="back-btn" @click="router.go(-1)">
           <i class="fa-duotone fa-solid fa-angle-left"></i>
         </button>
-        <i class="fa-duotone fa-solid fa-quote-left title-icon"></i>
+        <i class="fa-duotone fa-solid fa-book-open title-icon"></i>
         <h1>
-          {{ th.testi_admin_title }}
+          {{ th.sub_admin_title }}
           <span class="count">{{ rows.length }}</span>
         </h1>
       </div>
 
-      <p class="admin-sub">{{ th.testi_admin_sub }}</p>
+      <p class="admin-sub">{{ th.sub_admin_sub }}</p>
       <div class="scan-links">
         <router-link to="/admin" class="scan-link">
           <i class="fa-duotone fa-solid fa-id-badge"></i>
@@ -20,80 +20,63 @@
         </router-link>
         <button class="scan-link" @click="toggleForm">
           <i :class="`fa-duotone fa-solid ${formOpen ? 'fa-xmark' : 'fa-plus'}`"></i>
-          <span>{{ th.testi_add_btn }}</span>
+          <span>{{ th.sub_add_btn }}</span>
         </button>
       </div>
 
       <!-- Add / edit form -->
-      <form v-if="formOpen" class="testi-form" @submit.prevent="save">
+      <form v-if="formOpen" class="sub-form" @submit.prevent="save">
         <div class="field">
-          <label>{{ th.testi_quote_label }}</label>
+          <label>{{ th.sub_subject_label }}</label>
+          <input v-model="form.Subject" type="text" class="input" :placeholder="th.sub_subject_ph" required />
+        </div>
+        <div class="field">
+          <label>{{ th.sub_desc_label }}</label>
           <textarea
-            v-model="form.Quote"
-            rows="4"
+            v-model="form.Description"
+            rows="8"
             class="textarea"
-            :placeholder="th.testi_quote_ph"
+            :placeholder="th.sub_desc_ph"
             required
           ></textarea>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label>{{ th.testi_name_label }}</label>
-            <input v-model="form.Name" type="text" class="input" :placeholder="th.testi_name_ph" />
-          </div>
-          <div class="field">
-            <label>{{ th.testi_affil_label }}</label>
-            <input v-model="form.Affiliation" type="text" class="input" :placeholder="th.testi_affil_ph" />
-          </div>
-        </div>
-        <div class="field">
-          <label>{{ th.testi_year_label }}</label>
-          <input v-model="form.Year" type="number" class="input" :placeholder="th.testi_year_ph" />
         </div>
         <div class="form-actions">
           <button type="submit" class="btn-primary" :disabled="busy">
             <i class="fa-duotone fa-solid fa-check"></i>
-            <span>{{ th.testi_save_btn }}</span>
+            <span>{{ th.sub_save_btn }}</span>
           </button>
           <button type="button" class="btn-ghost" @click="closeForm">
-            {{ th.testi_cancel_btn }}
+            {{ th.sub_cancel_btn }}
           </button>
         </div>
-        <p v-if="error" class="form-error">{{ th.testi_save_failed }}</p>
+        <p v-if="error" class="form-error">{{ th.sub_save_failed }}</p>
       </form>
 
-      <!-- Success flash -->
       <p v-if="flash" class="flash" :class="flashType">{{ flash }}</p>
 
       <!-- List -->
-      <div class="testi-list" v-if="rows.length">
-        <div v-for="r in rows" :key="r.id" class="testi-card">
-          <div class="testi-quote">
-            <i class="fa-duotone fa-solid fa-quote-left quote-mark"></i>
-            <p>{{ r.fields.Quote }}</p>
-          </div>
-          <div class="testi-meta">
-            <span class="who">
-              {{ r.fields.Name }}
-              <span v-if="r.fields.Affiliation" class="affil">
-                {{ r.fields.Affiliation }}
-              </span>
+      <div class="sub-list" v-if="rows.length">
+        <div v-for="r in rows" :key="r.id" class="sub-card">
+          <div class="sub-head">
+            <span class="sub-icon">
+              <i :class="subjectIcon(r.fields.Subject)"></i>
             </span>
-            <span v-if="r.fields.Year" class="year-chip">{{ r.fields.Year }}</span>
+            <h3>{{ r.fields.Subject }}</h3>
           </div>
-          <div class="testi-actions">
+          <p class="sub-desc">{{ r.fields.Description }}</p>
+          <div class="sub-actions">
             <button class="mini-btn edit" @click="edit(r)">
               <i class="fa-duotone fa-solid fa-pen"></i>
-              {{ th.testi_edit_btn }}
+              {{ th.sub_edit_btn }}
             </button>
             <button class="mini-btn del" @click="remove(r)">
               <i class="fa-duotone fa-solid fa-trash"></i>
-              {{ th.testi_delete_btn }}
+              {{ th.sub_delete_btn }}
             </button>
           </div>
         </div>
       </div>
-      <p v-else-if="loaded" class="no-result">{{ th.testi_empty }}</p>
+      <p v-else-if="loaded" class="no-result">{{ th.sub_empty }}</p>
     </AdminPinGate>
   </div>
 </template>
@@ -104,11 +87,12 @@ import router from "../routers";
 import { th } from "../copy/th.js";
 import AdminPinGate from "../components/AdminPinGate.vue";
 import { isUnlocked } from "../api/adminAuth.js";
+import { subjectIcon } from "../data/subjectIcons.js";
 import {
-  listTestimonials,
-  saveTestimonial,
-  deleteTestimonial,
-} from "../api/testimonials.js";
+  listSubjects,
+  saveSubject,
+  deleteSubject,
+} from "../api/subjects.js";
 
 const rows = ref([]);
 const loaded = ref(false);
@@ -119,37 +103,32 @@ const error = ref(false);
 const flash = ref("");
 const flashType = ref("");
 
-const form = ref({ Quote: "", Name: "", Affiliation: "", Year: "" });
+const form = ref({ Subject: "", Description: "" });
 
 async function load() {
   if (loaded.value) return;
   loaded.value = true;
-  rows.value = await listTestimonials();
+  rows.value = await listSubjects();
 }
 
 function openForm() {
   editingId.value = null;
-  form.value = { Quote: "", Name: "", Affiliation: "", Year: "" };
+  form.value = { Subject: "", Description: "" };
   error.value = false;
   formOpen.value = true;
 }
-
 function toggleForm() {
   formOpen.value ? closeForm() : openForm();
 }
-
 function closeForm() {
   formOpen.value = false;
   editingId.value = null;
 }
-
 function edit(r) {
   editingId.value = r.id;
   form.value = {
-    Quote: r.fields.Quote ?? "",
-    Name: r.fields.Name ?? "",
-    Affiliation: r.fields.Affiliation ?? "",
-    Year: r.fields.Year ?? "",
+    Subject: r.fields.Subject ?? "",
+    Description: r.fields.Description ?? "",
   };
   error.value = false;
   formOpen.value = true;
@@ -160,11 +139,11 @@ async function save() {
   busy.value = true;
   error.value = false;
   try {
-    const saved = await saveTestimonial(form.value, editingId.value);
+    const saved = await saveSubject(form.value, editingId.value);
     if (!saved) throw new Error("no record");
     closeForm();
-    rows.value = await listTestimonials();
-    showFlash(th.testi_saved, "ok");
+    rows.value = await listSubjects();
+    showFlash(th.sub_saved, "ok");
   } catch {
     error.value = true;
   } finally {
@@ -173,13 +152,13 @@ async function save() {
 }
 
 async function remove(r) {
-  if (!window.confirm(th.testi_confirm_delete)) return;
+  if (!window.confirm(th.sub_confirm_delete)) return;
   try {
-    await deleteTestimonial(r.id);
-    rows.value = await listTestimonials();
-    showFlash(th.testi_deleted, "ok");
+    await deleteSubject(r.id);
+    rows.value = await listSubjects();
+    showFlash(th.sub_deleted, "ok");
   } catch {
-    showFlash(th.testi_save_failed, "err");
+    showFlash(th.sub_save_failed, "err");
   }
 }
 
@@ -226,7 +205,7 @@ onMounted(() => {
   font-family: inherit;
 }
 
-.testi-form {
+.sub-form {
   background: var(--md-surface);
   border: 1px solid var(--md-border);
   border-radius: 1rem;
@@ -246,11 +225,6 @@ onMounted(() => {
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--md-text-soft);
-}
-.field-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.9rem;
 }
 .input,
 .textarea {
@@ -325,71 +299,53 @@ onMounted(() => {
   color: #c0392b;
 }
 
-.testi-list {
+.sub-list {
   display: flex;
   flex-direction: column;
   gap: 0.9rem;
 }
-.testi-card {
+.sub-card {
   background: var(--md-surface);
   border: 1px solid var(--md-border);
   border-radius: 1rem;
   box-shadow: var(--md-shadow);
   padding: 1.1rem 1.2rem;
 }
-.testi-quote {
-  display: flex;
-  gap: 0.6rem;
-  align-items: flex-start;
-}
-.quote-mark {
-  color: var(--md-gold);
-  font-size: 1.1rem;
-  margin-top: 0.15rem;
-}
-.testi-quote p {
-  margin: 0;
-  color: var(--md-text);
-  font-size: 0.98rem;
-  line-height: 1.5;
-  white-space: pre-wrap;
-}
-.testi-meta {
+.sub-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  margin-top: 0.8rem;
-  padding-top: 0.7rem;
-  border-top: 1px solid var(--md-border);
+  gap: 0.7rem;
+  margin-bottom: 0.6rem;
 }
-.who {
-  font-weight: 600;
-  color: var(--md-text);
-  font-size: 0.92rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.affil {
-  font-weight: 400;
-  color: var(--md-text-muted);
-  font-size: 0.85rem;
-}
-.year-chip {
+.sub-icon {
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 0.7rem;
   background: var(--md-accent-soft);
   color: var(--md-accent);
-  border-radius: 999px;
-  padding: 0.15rem 0.65rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
 }
-.testi-actions {
+.sub-head h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--md-text);
+}
+.sub-desc {
+  margin: 0;
+  color: var(--md-text-soft);
+  font-size: 0.92rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.sub-actions {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.75rem;
+  margin-top: 0.85rem;
 }
 .mini-btn {
   display: inline-flex;
@@ -417,11 +373,5 @@ onMounted(() => {
   text-align: center;
   color: var(--md-text-muted);
   padding: 2rem 0;
-}
-
-@media (max-width: 600px) {
-  .field-row {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

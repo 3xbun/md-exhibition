@@ -45,57 +45,53 @@
         </div>
       </section>
 
-      <section class="testimonials" v-if="testimonials.length">
-        <h2 class="section-title">{{ th.testimonials_title }}</h2>
-        <p class="testi-sub">{{ th.testimonials_sub }}</p>
+      <section class="subjects" v-if="subjects.length">
+        <h2 class="section-title">{{ th.sub_title }}</h2>
+        <p class="sub-sub">{{ th.sub_sub }}</p>
         <div
-          class="testi-carousel"
+          class="sub-carousel"
           @touchstart.passive="onTouchStart"
           @touchend.passive="onTouchEnd"
         >
           <button
-            v-if="testimonials.length > 1"
-            class="testi-arrow prev"
+            v-if="subjects.length > 1"
+            class="sub-arrow prev"
             :aria-label="'previous'"
             @click="prev"
           >
             <i class="fa-duotone fa-solid fa-chevron-left"></i>
           </button>
-          <div class="testi-viewport">
+          <div class="sub-viewport">
             <div
-              class="testi-track"
+              class="sub-track"
               :style="{ transform: `translateX(-${index * 100}%)` }"
             >
-              <div v-for="t in testimonials" :key="t.id" class="testi-slide">
-                <div class="testi-card">
-                  <div class="testi-quote">
-                    <i class="fa-duotone fa-solid fa-quote-left quote-mark"></i>
-                    <p>{{ t.Quote }}</p>
-                  </div>
-                  <div class="testi-meta">
-                    <span class="who">
-                      {{ t.Name }}
-                      <span v-if="t.Affiliation" class="affil">{{ t.Affiliation }}</span>
+              <div v-for="s in subjects" :key="s.id" class="sub-slide">
+                <div class="sub-card">
+                  <div class="sub-card-head">
+                    <span class="sub-icon">
+                      <i :class="subjectIcon(s.Subject)"></i>
                     </span>
-                    <span v-if="t.Year" class="year-chip">{{ t.Year }}</span>
+                    <h3 class="sub-name">{{ s.Subject }}</h3>
                   </div>
+                  <p class="sub-desc">{{ s.Description }}</p>
                 </div>
               </div>
             </div>
           </div>
           <button
-            v-if="testimonials.length > 1"
-            class="testi-arrow next"
+            v-if="subjects.length > 1"
+            class="sub-arrow next"
             :aria-label="'next'"
             @click="next"
           >
             <i class="fa-duotone fa-solid fa-chevron-right"></i>
           </button>
         </div>
-        <div v-if="testimonials.length > 1" class="testi-dots">
+        <div v-if="subjects.length > 1" class="sub-dots">
           <button
-            v-for="(t, i) in testimonials"
-            :key="t.id"
+            v-for="(s, i) in subjects"
+            :key="s.id"
             class="dot"
             :class="{ active: i === index }"
             :aria-label="String(i + 1)"
@@ -111,10 +107,11 @@
 import { inject, ref, onMounted } from "vue";
 import { locations } from "../data/locations.js";
 import { th } from "../copy/th.js";
-import { listTestimonials } from "../api/testimonials.js";
+import { subjectIcon } from "../data/subjectIcons.js";
+import { listSubjects } from "../api/subjects.js";
 
 const events = inject("events");
-const testimonials = ref([]);
+const subjects = ref([]);
 const index = ref(0);
 
 const programCount = (name) =>
@@ -122,12 +119,12 @@ const programCount = (name) =>
 
 // --- Carousel controls (one card per view, wraps at the ends) ---
 const next = () => {
-  if (testimonials.value.length)
-    index.value = (index.value + 1) % testimonials.value.length;
+  if (subjects.value.length)
+    index.value = (index.value + 1) % subjects.value.length;
 };
 const prev = () => {
-  if (testimonials.value.length)
-    index.value = (index.value - 1 + testimonials.value.length) % testimonials.value.length;
+  if (subjects.value.length)
+    index.value = (index.value - 1 + subjects.value.length) % subjects.value.length;
 };
 // Swipe (touch): track the horizontal delta and advance past a small threshold.
 let touchX = 0;
@@ -140,22 +137,20 @@ function onTouchEnd(e) {
   else if (dx > 40) prev();
 }
 
-// Load visitor testimonials (newest year first). A failed fetch just hides the
-// section — the home page never blocks on it.
+// Load the per-subject descriptions. A failed fetch just hides the section —
+// the home page never blocks on it.
 onMounted(async () => {
   try {
-    const recs = await listTestimonials();
-    testimonials.value = recs
+    const recs = await listSubjects();
+    subjects.value = recs
       .map((r) => ({
         id: r.id,
-        Quote: r.fields?.Quote,
-        Name: r.fields?.Name,
-        Affiliation: r.fields?.Affiliation,
-        Year: r.fields?.Year,
+        Subject: r.fields?.Subject,
+        Description: r.fields?.Description,
       }))
-      .filter((t) => t.Quote);
+      .filter((s) => s.Subject && s.Description);
   } catch {
-    testimonials.value = [];
+    subjects.value = [];
   }
 });
 </script>
@@ -280,43 +275,74 @@ onMounted(async () => {
   font-size: 0.9rem;
 }
 
-/* --- Testimonials --- */
-.testimonials {
+/* --- Subjects --- */
+.subjects {
   margin-top: 2.25rem;
 }
-.testi-sub {
+.sub-sub {
   color: var(--md-text-soft);
   margin: 0.4rem 0 0 0.1rem;
   font-size: 0.95rem;
 }
-/* --- Testimonials carousel (one card per view) --- */
-.testi-carousel {
+/* --- Subjects carousel (one card per view) --- */
+.sub-carousel {
   position: relative;
   margin-top: 1.25rem;
 }
-.testi-viewport {
+.sub-viewport {
   overflow: hidden;
   border-radius: 1rem;
 }
-.testi-track {
+.sub-track {
   display: flex;
   transition: transform 0.35s ease;
 }
-.testi-slide {
+.sub-slide {
   flex: 0 0 100%;
   min-width: 0;
 }
-.testi-card {
+.sub-card {
   background: var(--md-surface);
   border: 1px solid var(--md-border);
   border-radius: 1rem;
   box-shadow: var(--md-shadow);
-  padding: 1.4rem 1.5rem;
+  padding: 1.5rem 1.6rem;
   display: flex;
   flex-direction: column;
-  min-height: 200px;
+  min-height: 260px;
 }
-.testi-arrow {
+.sub-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.9rem;
+}
+.sub-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.75rem;
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  flex-shrink: 0;
+}
+.sub-name {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--md-text);
+}
+.sub-desc {
+  margin: 0;
+  color: var(--md-text-soft);
+  font-size: 0.98rem;
+  line-height: 1.65;
+  white-space: pre-wrap;
+}
+.sub-arrow {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
@@ -335,17 +361,17 @@ onMounted(async () => {
   transition: background 0.15s ease, color 0.15s ease;
   z-index: 2;
 }
-.testi-arrow:hover {
+.sub-arrow:hover {
   background: var(--md-accent);
   color: #fff;
 }
-.testi-arrow.prev {
+.sub-arrow.prev {
   left: -0.5rem;
 }
-.testi-arrow.next {
+.sub-arrow.next {
   right: -0.5rem;
 }
-.testi-dots {
+.sub-dots {
   display: flex;
   justify-content: center;
   gap: 0.5rem;
@@ -365,69 +391,27 @@ onMounted(async () => {
   background: var(--md-accent);
   transform: scale(1.25);
 }
-.testi-quote {
-  display: flex;
-  gap: 0.55rem;
-  align-items: flex-start;
-}
-.quote-mark {
-  color: var(--md-gold);
-  font-size: 1.05rem;
-  margin-top: 0.2rem;
-}
-.testi-quote p {
-  margin: 0;
-  color: var(--md-text);
-  font-size: 0.98rem;
-  line-height: 1.55;
-  white-space: pre-wrap;
-}
-.testi-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-  margin-top: 1rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid var(--md-border);
-}
-.who {
-  font-weight: 600;
-  color: var(--md-text);
-  font-size: 0.92rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-.affil {
-  font-weight: 400;
-  color: var(--md-text-muted);
-  font-size: 0.85rem;
-}
-.year-chip {
-  background: var(--md-accent-soft);
-  color: var(--md-accent);
-  border-radius: 999px;
-  padding: 0.15rem 0.65rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  white-space: nowrap;
-}
 
 @media (max-width: 600px) {
   .loc-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-  .testi-arrow {
+  .sub-card {
+    padding: 1.2rem 1.25rem;
+    min-height: 240px;
+  }
+  .sub-name {
+    font-size: 1.1rem;
+  }
+  .sub-arrow {
     width: 2rem;
     height: 2rem;
     font-size: 0.9rem;
   }
-  .testi-arrow.prev {
+  .sub-arrow.prev {
     left: 0.35rem;
   }
-  .testi-arrow.next {
+  .sub-arrow.next {
     right: 0.35rem;
   }
 }
