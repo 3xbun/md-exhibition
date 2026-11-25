@@ -16,11 +16,6 @@ export const locations = [
   },
   { name: "MDO", map: "/imgs/maps/map-overall.jpeg", icon: "fa-music" },
   {
-    name: "ลานอัญจลา",
-    map: "/imgs/maps/map-overall.jpeg",
-    icon: "fa-seedling",
-  },
-  {
     name: "ห้องศิลปะ/ลานอุร์สุลา",
     map: "/imgs/maps/map-overall.jpeg",
     icon: "fa-palette",
