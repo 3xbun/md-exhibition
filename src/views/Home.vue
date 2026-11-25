@@ -48,20 +48,59 @@
       <section class="testimonials" v-if="testimonials.length">
         <h2 class="section-title">{{ th.testimonials_title }}</h2>
         <p class="testi-sub">{{ th.testimonials_sub }}</p>
-        <div class="testi-grid">
-          <div v-for="t in testimonials" :key="t.id" class="testi-card">
-            <div class="testi-quote">
-              <i class="fa-duotone fa-solid fa-quote-left quote-mark"></i>
-              <p>{{ t.Quote }}</p>
-            </div>
-            <div class="testi-meta">
-              <span class="who">
-                {{ t.Name }}
-                <span v-if="t.Affiliation" class="affil">{{ t.Affiliation }}</span>
-              </span>
-              <span v-if="t.Year" class="year-chip">{{ t.Year }}</span>
+        <div
+          class="testi-carousel"
+          @touchstart.passive="onTouchStart"
+          @touchend.passive="onTouchEnd"
+        >
+          <button
+            v-if="testimonials.length > 1"
+            class="testi-arrow prev"
+            :aria-label="'previous'"
+            @click="prev"
+          >
+            <i class="fa-duotone fa-solid fa-chevron-left"></i>
+          </button>
+          <div class="testi-viewport">
+            <div
+              class="testi-track"
+              :style="{ transform: `translateX(-${index * 100}%)` }"
+            >
+              <div v-for="t in testimonials" :key="t.id" class="testi-slide">
+                <div class="testi-card">
+                  <div class="testi-quote">
+                    <i class="fa-duotone fa-solid fa-quote-left quote-mark"></i>
+                    <p>{{ t.Quote }}</p>
+                  </div>
+                  <div class="testi-meta">
+                    <span class="who">
+                      {{ t.Name }}
+                      <span v-if="t.Affiliation" class="affil">{{ t.Affiliation }}</span>
+                    </span>
+                    <span v-if="t.Year" class="year-chip">{{ t.Year }}</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
+          <button
+            v-if="testimonials.length > 1"
+            class="testi-arrow next"
+            :aria-label="'next'"
+            @click="next"
+          >
+            <i class="fa-duotone fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
+        <div v-if="testimonials.length > 1" class="testi-dots">
+          <button
+            v-for="(t, i) in testimonials"
+            :key="t.id"
+            class="dot"
+            :class="{ active: i === index }"
+            :aria-label="String(i + 1)"
+            @click="index = i"
+          ></button>
         </div>
       </section>
     </main>
@@ -76,9 +115,30 @@ import { listTestimonials } from "../api/testimonials.js";
 
 const events = inject("events");
 const testimonials = ref([]);
+const index = ref(0);
 
 const programCount = (name) =>
   events.value.filter((e) => e.Location === name).length;
+
+// --- Carousel controls (one card per view, wraps at the ends) ---
+const next = () => {
+  if (testimonials.value.length)
+    index.value = (index.value + 1) % testimonials.value.length;
+};
+const prev = () => {
+  if (testimonials.value.length)
+    index.value = (index.value - 1 + testimonials.value.length) % testimonials.value.length;
+};
+// Swipe (touch): track the horizontal delta and advance past a small threshold.
+let touchX = 0;
+function onTouchStart(e) {
+  touchX = e.touches[0].clientX;
+}
+function onTouchEnd(e) {
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (dx < -40) next();
+  else if (dx > 40) prev();
+}
 
 // Load visitor testimonials (newest year first). A failed fetch just hides the
 // section — the home page never blocks on it.
@@ -229,20 +289,81 @@ onMounted(async () => {
   margin: 0.4rem 0 0 0.1rem;
   font-size: 0.95rem;
 }
-.testi-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 1rem;
+/* --- Testimonials carousel (one card per view) --- */
+.testi-carousel {
+  position: relative;
   margin-top: 1.25rem;
+}
+.testi-viewport {
+  overflow: hidden;
+  border-radius: 1rem;
+}
+.testi-track {
+  display: flex;
+  transition: transform 0.35s ease;
+}
+.testi-slide {
+  flex: 0 0 100%;
+  min-width: 0;
 }
 .testi-card {
   background: var(--md-surface);
   border: 1px solid var(--md-border);
   border-radius: 1rem;
   box-shadow: var(--md-shadow);
-  padding: 1.2rem 1.3rem;
+  padding: 1.4rem 1.5rem;
   display: flex;
   flex-direction: column;
+  min-height: 200px;
+}
+.testi-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  border: 1px solid var(--md-border);
+  background: var(--md-surface);
+  color: var(--md-accent);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: var(--md-shadow);
+  transition: background 0.15s ease, color 0.15s ease;
+  z-index: 2;
+}
+.testi-arrow:hover {
+  background: var(--md-accent);
+  color: #fff;
+}
+.testi-arrow.prev {
+  left: -0.5rem;
+}
+.testi-arrow.next {
+  right: -0.5rem;
+}
+.testi-dots {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+.dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 999px;
+  border: none;
+  background: var(--md-border);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+.dot.active {
+  background: var(--md-accent);
+  transform: scale(1.25);
 }
 .testi-quote {
   display: flex;
@@ -298,8 +419,16 @@ onMounted(async () => {
   .loc-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   }
-  .testi-grid {
-    grid-template-columns: 1fr;
+  .testi-arrow {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+  }
+  .testi-arrow.prev {
+    left: 0.35rem;
+  }
+  .testi-arrow.next {
+    right: 0.35rem;
   }
 }
 </style>
