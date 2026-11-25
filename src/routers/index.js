@@ -9,6 +9,7 @@ import StaffScan from "../views/StaffScan.vue";
 import Badge from "../views/Badge.vue";
 import Admin from "../views/Admin.vue";
 import AdminTraffic from "../views/AdminTraffic.vue";
+import AdminTestimonials from "../views/AdminTestimonials.vue";
 import Stage from "../views/Stage.vue";
 
 const routes = [
@@ -22,6 +23,7 @@ const routes = [
   { path: "/admin", name: "admin", component: Admin },
   { path: "/admin/scan", name: "staff-scan", component: StaffScan },
   { path: "/admin/traffic", name: "admin-traffic", component: AdminTraffic },
+  { path: "/admin/testimonials", name: "admin-testimonials", component: AdminTestimonials },
   { path: "/stage/:name", name: "stage", component: Stage },
 ];
 

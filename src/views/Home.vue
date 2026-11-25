@@ -44,19 +44,60 @@
           </router-link>
         </div>
       </section>
+
+      <section class="testimonials" v-if="testimonials.length">
+        <h2 class="section-title">{{ th.testimonials_title }}</h2>
+        <p class="testi-sub">{{ th.testimonials_sub }}</p>
+        <div class="testi-grid">
+          <div v-for="t in testimonials" :key="t.id" class="testi-card">
+            <div class="testi-quote">
+              <i class="fa-duotone fa-solid fa-quote-left quote-mark"></i>
+              <p>{{ t.Quote }}</p>
+            </div>
+            <div class="testi-meta">
+              <span class="who">
+                {{ t.Name }}
+                <span v-if="t.Affiliation" class="affil">{{ t.Affiliation }}</span>
+              </span>
+              <span v-if="t.Year" class="year-chip">{{ t.Year }}</span>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   </div>
 </template>
 
 <script setup>
-import { inject } from "vue";
+import { inject, ref, onMounted } from "vue";
 import { locations } from "../data/locations.js";
+import { th } from "../copy/th.js";
+import { listTestimonials } from "../api/testimonials.js";
 
 const events = inject("events");
+const testimonials = ref([]);
 
 const programCount = (name) =>
   events.value.filter((e) => e.Location === name).length;
 
+// Load visitor testimonials (newest year first). A failed fetch just hides the
+// section — the home page never blocks on it.
+onMounted(async () => {
+  try {
+    const recs = await listTestimonials();
+    testimonials.value = recs
+      .map((r) => ({
+        id: r.id,
+        Quote: r.fields?.Quote,
+        Name: r.fields?.Name,
+        Affiliation: r.fields?.Affiliation,
+        Year: r.fields?.Year,
+      }))
+      .filter((t) => t.Quote);
+  } catch {
+    testimonials.value = [];
+  }
+});
 </script>
 
 <style scoped>
@@ -179,9 +220,86 @@ const programCount = (name) =>
   font-size: 0.9rem;
 }
 
+/* --- Testimonials --- */
+.testimonials {
+  margin-top: 2.25rem;
+}
+.testi-sub {
+  color: var(--md-text-soft);
+  margin: 0.4rem 0 0 0.1rem;
+  font-size: 0.95rem;
+}
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+.testi-card {
+  background: var(--md-surface);
+  border: 1px solid var(--md-border);
+  border-radius: 1rem;
+  box-shadow: var(--md-shadow);
+  padding: 1.2rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+}
+.testi-quote {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+}
+.quote-mark {
+  color: var(--md-gold);
+  font-size: 1.05rem;
+  margin-top: 0.2rem;
+}
+.testi-quote p {
+  margin: 0;
+  color: var(--md-text);
+  font-size: 0.98rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+}
+.testi-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--md-border);
+}
+.who {
+  font-weight: 600;
+  color: var(--md-text);
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.affil {
+  font-weight: 400;
+  color: var(--md-text-muted);
+  font-size: 0.85rem;
+}
+.year-chip {
+  background: var(--md-accent-soft);
+  color: var(--md-accent);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 @media (max-width: 600px) {
   .loc-grid {
     grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+  .testi-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

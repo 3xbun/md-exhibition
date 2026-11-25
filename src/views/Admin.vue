@@ -22,6 +22,10 @@
           <i class="fa-duotone fa-solid fa-chart-column"></i>
           <span>{{ th.traffic_title }}</span>
         </router-link>
+        <router-link to="/admin/testimonials" class="scan-link">
+          <i class="fa-duotone fa-solid fa-quote-left"></i>
+          <span>{{ th.testi_admin_title }}</span>
+        </router-link>
       </div>
 
       <div class="admin-search">
