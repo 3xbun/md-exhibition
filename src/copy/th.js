@@ -85,7 +85,7 @@ export const th = {
   qr_section: "QR code ประจำจุด",
   qr_sub: "พิมพ์ QR code เหล่านี้ (จุดละ 1 แผ่น) เพื่อนำไปวางในพื้นที่นะค่ะ",
   qr_download: "ดาวน์โหลด QR",
-  testimonials_title: "เสียงจากแขกผู้มาเยือน",
+  testimonials_title: "เสียงจากกลุ่มสาระของพวกเรา",
   testimonials_sub: "มาฟังเรื่องราวจากแขกที่มาชมงานกันเถอะ",
   testi_admin_title: "จัดการเสียงจากแขก",
   testi_admin_sub: "เจ้าหน้าที่เพิ่ม แก้ไข และลบเสียงจากแขกบนหน้าหลักได้",
