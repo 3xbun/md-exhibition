@@ -9,7 +9,17 @@
           <i class="fa-duotone fa-solid fa-angle-left"></i>
         </button>
         <i class="fa-duotone fa-solid fa-users-gear title-icon"></i>
-        <h1>{{ th.admin_title }} <span class="count">{{ total }} {{ th.total_label }}</span></h1>
+        <h1>
+          {{ th.admin_title }} <span class="count">{{ totalLabel }}</span>
+        </h1>
+        <button
+          class="refresh-btn"
+          @click="refresh"
+          :disabled="loading"
+          title="refresh"
+        >
+          <i class="fa-duotone fa-solid fa-rotate" :class="{ spinning: loading }"></i>
+        </button>
       </div>
 
       <p class="admin-sub">{{ th.admin_sub }}</p>
@@ -46,9 +56,26 @@
         </button>
       </div>
 
-      <p v-if="loading && !rows.length" class="admin-loading">{{ th.admin_loading }}</p>
+      <div class="admin-table" v-if="skeleton">
+        <div class="thead">
+          <span>{{ th.col_name }}</span>
+          <span>{{ th.col_type }}</span>
+          <span>{{ th.col_code }}</span>
+          <span>{{ th.col_child }}</span>
+          <span>{{ th.col_checkin }}</span>
+          <span>{{ th.col_created }}</span>
+        </div>
+        <div v-for="n in skeletonRows" :key="n" class="trow skel-row">
+          <span class="skeleton skel-name"></span>
+          <span class="skeleton skel-chip"></span>
+          <span class="skeleton skel-code"></span>
+          <span class="skeleton skel-chip"></span>
+          <span class="skeleton skel-chip"></span>
+          <span class="skeleton skel-date"></span>
+        </div>
+      </div>
 
-      <div class="admin-table" v-if="rows.length">
+      <div class="admin-table" v-else-if="rows.length">
         <div class="thead">
           <span>{{ th.col_name }}</span>
           <span>{{ th.col_type }}</span>
@@ -93,10 +120,10 @@
       <p v-else-if="loaded && !query && !loading" class="no-result">{{ th.empty }}</p>
       <p v-else-if="loaded && query && !loading" class="no-result">{{ th.admin_no_match }}</p>
 
-      <div class="admin-pager" v-if="!loading && total > PAGE_SIZE">
+      <div class="admin-pager" v-if="!skeleton && total > PAGE_SIZE">
         <button
           class="pager-btn"
-          :disabled="page <= 1"
+          :disabled="page <= 1 || loading"
           @click="page--"
           :aria-label="th.admin_prev_page"
         >
@@ -105,7 +132,7 @@
         <span class="pager-info">{{ page }} / {{ totalPages }}</span>
         <button
           class="pager-btn"
-          :disabled="page >= totalPages"
+          :disabled="page >= totalPages || loading"
           @click="page++"
           :aria-label="th.admin_next_page"
         >
@@ -123,48 +150,82 @@ import dayjs from "dayjs";
 import { th } from "../copy/th.js";
 import AdminPinGate from "../components/AdminPinGate.vue";
 import { isUnlocked } from "../api/adminAuth.js";
-import { listParents, countParents, getChildren } from "../api/parents.js";
+import { listParents, getChildren } from "../api/parents.js";
 
 const PAGE_SIZE = 25;
-const SEARCH_DEBOUNCE_MS = 400;
+const CACHE_KEY = "md-exhibition.admin-badges";
 
-const rows = ref([]);
+// `all` holds every badge record (newest-first). It is hydrated from
+// localStorage first (instant, no skeleton flash), then re-fetched in the
+// background and the cache is refreshed. Search + pagination run on this
+// cached set client-side, so flipping pages / searching is instant.
+const all = ref([]);
+const allChildren = ref({}); // parentId -> [StudentID, ...]
 const loaded = ref(false);
 const loading = ref(false);
 const query = ref("");
 const page = ref(1);
-const total = ref(0);
+
+// Client-side search: first name, last name OR badge code.
+const filteredList = computed(() => {
+  const q = query.value.trim().toLowerCase();
+  if (!q) return all.value;
+  return all.value.filter((r) => {
+    const f = r.fields;
+    const name = `${f.FirstName ?? ""} ${f.LastName ?? ""}`.toLowerCase();
+    return name.includes(q) || String(f.BadgeCode ?? "").toLowerCase().includes(q);
+  });
+});
+
+const total = computed(() => filteredList.value.length);
 const totalPages = computed(() =>
   Math.max(1, Math.ceil(total.value / PAGE_SIZE))
 );
+const totalLabel = computed(() => `${total.value} ${th.total_label}`);
 
-// Server-side search: first name, last name OR badge code (like %q%).
-const searchWhere = computed(() => {
-  const q = query.value.trim().replace(/"/g, "");
-  if (!q) return undefined;
-  const v = `"%${q}%"`;
-  return `(FirstName,like,${v})~or(LastName,like,${v})~or(BadgeCode,like,${v})`;
+// Current page slice, joined with the (per-page) child ids.
+const rows = computed(() => {
+  const start = (page.value - 1) * PAGE_SIZE;
+  return filteredList.value
+    .slice(start, start + PAGE_SIZE)
+    .map((r) => ({ id: r.id, fields: r.fields, childIds: allChildren.value[r.id] ?? [] }));
 });
 
-// Debounce the query: reset to page 1. Changing the page triggers the
-// page watcher (immediate fetch); if we were already on page 1 the fetch
-// waits for the debounce (the API rate-limits bursts — do NOT query per
-// keystroke).
-let searchTimer = null;
+// Skeleton: only while a full fetch is in flight AND nothing is on screen yet
+// (a cached list renders instantly, so a background refresh never re-skeletons).
+const skeleton = computed(() => loading.value && all.value.length === 0);
+const skeletonRows = PAGE_SIZE;
+
+// Keep the page valid if the list shrinks (e.g. a search narrows results).
+watch(totalPages, (tp) => {
+  if (page.value > tp) page.value = tp;
+});
 watch(query, () => {
-  const wasPage1 = page.value === 1;
   page.value = 1;
-  clearTimeout(searchTimer);
-  if (wasPage1) {
-    searchTimer = setTimeout(() => {
-      searchTimer = null;
-      load();
-    }, SEARCH_DEBOUNCE_MS);
-  }
+  fetchChildrenForPage();
 });
-watch(page, () => load());
+// Children are fetched per page (the links API is per-parent — not for all
+// 1,600+ at once). Flip page / search -> refresh children for the slice.
+watch(page, fetchChildrenForPage);
 
-// Fetch children per badge with limited concurrency (API rate-limits bursts)
+// --- localStorage cache ---------------------------------------------
+function readCache() {
+  try {
+    const obj = JSON.parse(localStorage.getItem(CACHE_KEY) ?? "null");
+    return obj && Array.isArray(obj.records) ? obj : null;
+  } catch {
+    return null;
+  }
+}
+function writeCache(records) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ savedAt: Date.now(), records }));
+  } catch {
+    /* storage full / private mode — cache is best-effort */
+  }
+}
+
+// --- children (per page) --------------------------------------------
 async function loadChildren(ids) {
   const out = {};
   let i = 0;
@@ -181,37 +242,53 @@ async function loadChildren(ids) {
   await Promise.all(Array.from({ length: Math.min(4, ids.length) }, worker));
   return out;
 }
+async function fetchChildrenForPage() {
+  const start = (page.value - 1) * PAGE_SIZE;
+  const slice = filteredList.value.slice(start, start + PAGE_SIZE);
+  const missing = slice.map((r) => r.id).filter((id) => !(id in allChildren.value));
+  if (!missing.length) return;
+  try {
+    const kids = await loadChildren(missing);
+    Object.assign(allChildren.value, kids);
+  } catch {
+    /* child chips stay empty; badge rows still render */
+  }
+}
 
-// Data loads ONLY after the PIN gate has passed. Fetches the current
-// page + search state; a seq guard drops stale responses when pages are
-// turned quickly.
+// --- load -----------------------------------------------------------
+// Hydrates from cache first (instant), then fetches the full list, persists it,
+// and refreshes children for the current page. A seq guard drops stale
+// responses if a refresh races an earlier one.
 let seq = 0;
 async function load() {
   if (!isUnlocked()) return;
   const mySeq = ++seq;
+  const cache = readCache();
+  if (cache && cache.records.length) {
+    all.value = cache.records;
+    loaded.value = true;
+  }
   loading.value = true;
-  const offset = (page.value - 1) * PAGE_SIZE;
-  const where = searchWhere.value;
   try {
-    const recs = await listParents({ limit: PAGE_SIZE, offset, where });
-    if (mySeq !== seq) return; // a newer request superseded this one
-    const kids = await loadChildren(recs.map((r) => r.id));
+    const recs = await listParents({ fetchAll: true });
     if (mySeq !== seq) return;
-    rows.value = recs.map((r) => ({
-      id: r.id,
-      fields: r.fields,
-      childIds: kids[r.id] ?? [],
-    }));
-    total.value = await countParents(where);
+    all.value = recs;
+    writeCache(recs);
   } catch (e) {
     console.error("admin load failed", e);
-    if (mySeq === seq) rows.value = [];
+    if (!cache || !cache.records.length) all.value = []; // show empty, not stuck
   } finally {
     if (mySeq === seq) {
       loaded.value = true;
       loading.value = false;
+      fetchChildrenForPage();
     }
   }
+}
+// Manual refresh: re-fetch the full list while keeping the current rows on
+// screen (no skeleton, since `all` is already populated).
+function refresh() {
+  load();
 }
 
 onMounted(() => {
@@ -240,6 +317,37 @@ const typeChipClass = (t) => (t === "parent" ? "" : "guest");
   color: var(--md-text-muted);
   font-size: 1rem;
   font-weight: 400;
+}
+.refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border-radius: 999px;
+  border: 1px solid var(--md-border);
+  background: var(--md-surface);
+  color: var(--md-accent);
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: var(--md-shadow);
+  transition: background 0.12s ease;
+  flex: none;
+}
+.refresh-btn:hover:not(:disabled) {
+  background: var(--md-accent-soft);
+}
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.spinning {
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 .scan-links {
   display: flex;
@@ -390,6 +498,39 @@ const typeChipClass = (t) => (t === "parent" ? "" : "guest");
   text-align: center;
   color: var(--md-text-muted);
   padding: 1.5rem 0;
+}
+.skeleton {
+  display: block;
+  height: 0.85rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    var(--md-surface-2) 25%,
+    #e7ebf3 37%,
+    var(--md-surface-2) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.3s ease-in-out infinite;
+}
+@keyframes shimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+.skel-name {
+  width: 70%;
+}
+.skel-chip {
+  width: 55%;
+}
+.skel-code {
+  width: 80%;
+}
+.skel-date {
+  width: 75%;
 }
 .admin-pager {
   display: flex;

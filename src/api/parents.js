@@ -88,15 +88,34 @@ export async function getChildren(parentId) {
 }
 
 /** All registered badges (parents + guests), paginated (newest first).
- *  Pass `where` (v3 where-clause string) to filter, e.g. badge search. */
-export async function listParents({ limit = 25, offset = 0, where } = {}) {
+ *  Pass `where` (v3 where-clause string) to filter, e.g. badge search.
+ *  `fetchAll` pages through the whole table (capped) so the admin screen can
+ *  cache everything in localStorage after a single unlock. */
+export async function listParents({ limit = 25, offset = 0, where, fetchAll = false } = {}) {
   const params = {
-    limit: String(limit),
-    offset: String(offset),
     sort: JSON.stringify([{ field: "CreatedAt", direction: "desc" }]),
     fields: "Id,FirstName,LastName,BadgeCode,Type,ClassNumber,Phone,CheckedInAt,CreatedAt",
   };
   if (where) params.where = where;
+  if (fetchAll) {
+    const all = [];
+    const chunk = 500;
+    for (let off = 0; ; off += chunk) {
+      params.offset = String(off);
+      params.limit = String(chunk);
+      const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`, {
+        params,
+        headers: hdrs(),
+      });
+      const recs = res.data?.records ?? [];
+      all.push(...recs);
+      if (recs.length < chunk) break;
+      if (all.length >= 5000) break; // hard cap: never runaway
+    }
+    return all;
+  }
+  params.offset = String(offset);
+  params.limit = String(limit);
   const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`, {
     params,
     headers: hdrs(),
