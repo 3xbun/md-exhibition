@@ -87,16 +87,33 @@ export async function getChildren(parentId) {
   return links.map((l) => byId[l.id] ?? { id: l.id, fields: { StudentID: l.fields?.StudentID } });
 }
 
-/** All registered badges (parents + guests). */
-export async function listParents(limit = 200) {
+/** All registered badges (parents + guests), paginated (newest first).
+ *  Pass `where` (v3 where-clause string) to filter, e.g. badge search. */
+export async function listParents({ limit = 25, offset = 0, where } = {}) {
+  const params = {
+    limit: String(limit),
+    offset: String(offset),
+    sort: JSON.stringify([{ field: "CreatedAt", direction: "desc" }]),
+    fields: "Id,FirstName,LastName,BadgeCode,Type,ClassNumber,Phone,CheckedInAt,CreatedAt",
+  };
+  if (where) params.where = where;
   const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/records`, {
-    params: {
-      limit: String(limit),
-      sort: JSON.stringify([{ field: "CreatedAt", direction: "desc" }]),
-    },
+    params,
     headers: hdrs(),
   });
   return res.data?.records ?? [];
+}
+
+/** Total badge count (optional v3 where-clause) — the v3 records
+ *  endpoint returns no `total`, so the admin pagination bar uses this. */
+export async function countParents(where) {
+  const params = {};
+  if (where) params.where = where;
+  const res = await axios.get(`${BASE}/v3/data/${BASE_ID}/${PARENTS}/count`, {
+    params,
+    headers: hdrs(),
+  });
+  return res.data?.count ?? 0;
 }
 
 /** True if a member (student) already has a parent badge linked. */
